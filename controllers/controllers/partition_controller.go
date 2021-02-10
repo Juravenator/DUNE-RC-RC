@@ -113,20 +113,29 @@ func (r *PartitionReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		}
 	}
 
+	partition.Status.Status = "happy"
 	for _, daqApp := range daqApps {
 		err := r.Patch(ctx, daqApp, client.Apply, applyOpts...)
 		if err != nil {
 			log.Error(err, "cannot patch DAQApplication")
 			return ctrl.Result{}, err
 		}
+		var realDaqApp rcccmv0alpha0.DAQApplication
+		appName := client.ObjectKey{Name: daqApp.ObjectMeta.Name, Namespace: req.Namespace}
+		if err := r.Get(ctx, appName, &realDaqApp); err == nil {
+			log.Info("real state of daq app", "state", realDaqApp.Status.Status)
+			if realDaqApp.Status.Status != "happy" {
+				partition.Status.Status = "sad"
+			}
+		}
 	}
 
-	// log.Info("updating status")
-	// err := r.Status().Update(ctx, &partition)
-	// if err != nil {
-	// 	log.Error(err, "could not update status")
-	// 	return ctrl.Result{}, err
-	// }
+	log.Info("updating status")
+	err := r.Status().Update(ctx, &partition)
+	if err != nil {
+		log.Error(err, "could not update status")
+		return ctrl.Result{}, err
+	}
 
 	log.Info("Partition reconciliation successfull")
 

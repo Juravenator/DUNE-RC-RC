@@ -19,13 +19,13 @@ type DAQState string
 // Available commands: | init | conf | start | stop | pause | resume | scrap
 const (
 	UnknownState    DAQState = "UNKNOWN"
-	ErrorState               = "ERROR"
-	InitState                = "INIT"
-	ConfiguredState          = "CONFIGURED"
-	StartedState             = "STARTED"
-	PausedState              = "PAUSED"
-	StoppedState             = "STOPPED"
-	ScrappedState            = "SCRAPPED"
+	ErrorState      DAQState = "ERROR"
+	InitState       DAQState = "INIT"
+	ConfiguredState DAQState = "CONFIGURED"
+	StartedState    DAQState = "STARTED"
+	PausedState     DAQState = "PAUSED"
+	StoppedState    DAQState = "STOPPED"
+	ScrappedState   DAQState = "SCRAPPED"
 )
 
 // DAQProcess wraps Process with DAQ state
@@ -42,30 +42,48 @@ func ToDAQProcess(process *Process) DAQProcess {
 
 // ChangeState issues commands to push the DAQ process in a certain state
 // it does NOT block for the command to succeeded, check p.TransitioningState and p.State
-func (p *DAQProcess) ChangeState(desiredState DAQState) error {
+// func (p *DAQProcess) ChangeState(desiredState DAQState) error {
 
-	// figure out what command we want to send
-	command := ""
-	switch desiredState {
-	case InitState:
-		command = "init"
-	case ConfiguredState:
-		command = "conf"
-	case StartedState:
-		command = "start"
-		if p.State == PausedState {
-			command = "resume"
-		}
-	case PausedState:
-		command = "pause"
-	case StoppedState:
-		command = "stop"
-	case ScrappedState:
-		command = "scrap"
-	}
+// 	// figure out what command we want to send
+// 	command := ""
+// 	switch desiredState {
+// 	case InitState:
+// 		command = "init"
+// 	case ConfiguredState:
+// 		command = "conf"
+// 	case StartedState:
+// 		command = "start"
+// 		if p.State == PausedState {
+// 			command = "resume"
+// 		}
+// 	case PausedState:
+// 		command = "pause"
+// 	case StoppedState:
+// 		command = "stop"
+// 	case ScrappedState:
+// 		command = "scrap"
+// 	}
 
-	if command == "" {
-		return fmt.Errorf("Cannot determine command to change to state '%s': %w", desiredState, CannotStateChangeError)
+// 	if command == "" {
+// 		return fmt.Errorf("Cannot determine command to change to state '%s': %w", desiredState, CannotStateChangeError)
+// 	}
+func (p *DAQProcess) SendCommandAndWait(command string) error {
+	var desiredStateFromCommand DAQState
+	switch command {
+	case "init":
+		desiredStateFromCommand = InitState
+	case "conf":
+		desiredStateFromCommand = ConfiguredState
+	case "start", "resume":
+		desiredStateFromCommand = StartedState
+	case "pause":
+		desiredStateFromCommand = PausedState
+	case "stop":
+		desiredStateFromCommand = StoppedState
+	case "scrap":
+		desiredStateFromCommand = ScrappedState
+	default:
+		return fmt.Errorf("Cannot determine desired state from command '%s': %w", command, CannotStateChangeError)
 	}
 
 	// drain any unread log messages
@@ -87,7 +105,7 @@ func (p *DAQProcess) ChangeState(desiredState DAQState) error {
 				continue
 			}
 			if err == nil {
-				p.State = desiredState
+				p.State = DAQState(desiredStateFromCommand)
 			} else {
 				p.State = ErrorState
 				log.WithError(err).Error("possible command failure")

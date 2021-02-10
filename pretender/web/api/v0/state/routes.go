@@ -12,32 +12,34 @@ import (
 
 func init() {
 	router.Get("/", getState)
-	router.Put("/", putState)
+	router.Post("/", postCommand)
 }
 
 type stateResponse struct {
-	State internal.DAQState `json:"state"`
+	State         internal.DAQState `json:"state"`
+	Transitioning bool              `json:"transitioning"`
 }
 
 func getState(w http.ResponseWriter, r *http.Request) {
 	response := stateResponse{
-		State: daq.State,
+		State:         daq.State,
+		Transitioning: daq.TransitioningState,
 	}
 	render.JSON(w, r, response)
 }
 
-type putStateRequest struct {
-	State   string                 `json:"state"`
+type commandRequest struct {
+	Command string                 `json:"command"`
 	Payload map[string]interface{} `json:"payload,omitempty"`
 }
 
-func putState(w http.ResponseWriter, r *http.Request) {
-	var payload putStateRequest
+func postCommand(w http.ResponseWriter, r *http.Request) {
+	var payload commandRequest
 	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
 		util.ErrorMsg(400, "cannot parse request body")
 	}
-	err = daq.ChangeState(internal.DAQState(payload.State))
+	err = daq.SendCommandAndWait(payload.Command)
 	if err != nil {
 		code := 500
 		if errors.Is(err, internal.CannotStateChangeError) {
