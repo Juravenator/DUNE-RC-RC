@@ -1,0 +1,24 @@
+# permissions for end users to edit daqapplications.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: daqapplication-editor-role
+rules:
+- apiGroups:
+  - rc.ccm.dunescience.org
+  resources:
+  - daqapplications
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rc.ccm.dunescience.org
+  resources:
+  - daqapplications/status
+  verbs:
+  - get

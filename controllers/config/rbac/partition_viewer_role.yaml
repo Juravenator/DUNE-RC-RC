@@ -1,0 +1,20 @@
+# permissions for end users to view partitions.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: partition-viewer-role
+rules:
+- apiGroups:
+  - rc.ccm.dunescience.org
+  resources:
+  - partitions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - rc.ccm.dunescience.org
+  resources:
+  - partitions/status
+  verbs:
+  - get
