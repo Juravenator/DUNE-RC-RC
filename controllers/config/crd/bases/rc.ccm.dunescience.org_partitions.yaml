@@ -41,6 +41,8 @@ spec:
           spec:
             description: PartitionSpec defines the desired state of Partition
             properties:
+              configName:
+                type: string
               resources:
                 items:
                   properties:
@@ -75,6 +77,7 @@ spec:
                 minimum: 0
                 type: integer
             required:
+            - configName
             - resources
             - runNumber
             type: object

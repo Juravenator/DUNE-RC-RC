@@ -30,8 +30,9 @@ type PartitionSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// +kubebuilder:validation:Minimum=0
-	RunNumber *int64       `json:"runNumber"`
-	Resources []ModuleSpec `json:"resources"`
+	RunNumber  *int64       `json:"runNumber"`
+	ConfigName string       `json:"configName"`
+	Resources  []ModuleSpec `json:"resources"`
 }
 
 type ModuleSpec struct {

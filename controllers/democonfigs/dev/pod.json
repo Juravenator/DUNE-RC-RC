@@ -8,7 +8,7 @@
     "containers": [
       {
         "name": "dev",
-        "image": "gitlab-registry.cern.ch/cms-cactus/ops/auto-devops/basics-cc7:tag-0.0.8",
+        "image": "gitlab-registry.cern.ch/gdirkx/dune-daq-app-mmvp/ctrlrunner:latest",
         "command": ["/bin/bash", "-c", "--"],
         "args": [ "while true; do sleep 300; done;" ],
         "volumeMounts": [

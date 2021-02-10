@@ -4,6 +4,7 @@ metadata:
   name: partition-sample
 spec:
   runNumber: 5
+  configName: my-first-daq-config
   resources:
   - module: A # one of the four 10kt module names
     TPC:
