@@ -1,7 +1,0 @@
-apiVersion: rc.ccm.dunescience.org/v0alpha0
-kind: DAQApplication
-metadata:
-  name: daqapplication-sample
-spec:
-  podName: bare-pod-daq-app
-  desiredState: STARTED
