@@ -9,6 +9,10 @@ services:
     image: dune-rc-march-ssh-server
   dune-rc-march-gp-1:
     image: dune-rc-march-ssh-server
+  dune-rc-march-gp-2:
+    image: dune-rc-march-ssh-server
+  dune-rc-march-gp-3:
+    image: dune-rc-march-ssh-server
 
   ansible:
     image: dune-rc-march-ansible

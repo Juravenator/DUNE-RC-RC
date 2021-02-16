@@ -1,0 +1,3 @@
+client_addr = "127.0.0.1"
+server = true
+bootstrap_expect = {{ groups['general_purpose_hosts'] | length }}

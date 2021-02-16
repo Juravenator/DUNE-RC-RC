@@ -1,8 +1,118 @@
+# - hosts: consul
+#   vars:
+#     ansible_python_interpreter: /usr/bin/python
+#   roles:
+#     - andrewrothstein.consul-cluster
+
+# consul installation docs:
+# https://learn.hashicorp.com/tutorials/consul/deployment-guide?in=consul/production-deploy
+
 - hosts: all
   tasks:
-  - name: Copy using inline content
+  - name: yum
+    vars:
+      # yum-python bindings are not python3 compatible
+      ansible_python_interpreter: /usr/bin/python2
+    yum:
+      name:
+      - unzip
+      state: present
+  - name: download consul
+    get_url:
+      url: https://releases.hashicorp.com/consul/1.9.3/consul_1.9.3_linux_amd64.zip
+      dest: /tmp/consul.zip
+    register: consul_zip
+
+  - name: install consul
+    unarchive:
+      src: /tmp/consul.zip
+      dest: /usr/bin
+      copy: no
+    when: consul_zip.changed
+
+  - name: copy consul CA cert
     copy:
-      content: |
-        net.bridge.bridge-nf-call-ip6tables = 1
-        net.bridge.bridge-nf-call-iptables = 1
-      dest: /etc/sysctl.d/k8s.conf
+      src: consul/consul-agent-ca.pem
+      dest: /etc/consul.d/
+  
+  - name: copy generic consul config
+    copy:
+      src: consul/consul.hcl
+      dest: /etc/consul.d/
+
+- hosts: general_purpose_hosts
+  tasks:
+  - name: copy consul server keys
+    copy:
+      src: consul/dune-rc-server-consul-{{ inventory_hostname | regex_replace('dune-rc-march-gp-', '') }}-key.pem
+      dest: /etc/consul.d/consul-key.pem
+  - name: copy consul server certs
+    copy:
+      src: consul/dune-rc-server-consul-{{ inventory_hostname | regex_replace('dune-rc-march-gp-', '') }}.pem
+      dest: /etc/consul.d/consul.pem
+  - name: copy consul server config
+    template:
+      src: consul/server.hcl.template
+      dest: /etc/consul.d/server.hcl
+
+- hosts: readout_unit_hosts
+  tasks:
+  - name: copy consul client keys
+    copy:
+      src: consul/dune-rc-client-consul-{{ inventory_hostname | regex_replace('dune-rc-march-ru-', '') }}-key.pem
+      dest: /etc/consul.d/consul-key.pem
+  - name: copy consul client certs
+    copy:
+      src: consul/dune-rc-client-consul-{{ inventory_hostname | regex_replace('dune-rc-march-ru-', '') }}.pem
+      dest: /etc/consul.d/consul.pem
+
+- hosts: all
+  tasks:
+  - name: check if consul is running
+    shell: "pgrep consul"
+    register: consul_running
+    failed_when: consul_running.rc > 1
+    changed_when: consul_running.rc == 1
+  
+  - name: start consul
+    when: consul_running.rc == 1
+    shell: nohup /usr/bin/consul agent -config-dir=/etc/consul.d/ </dev/null >/dev/null 2>&1 &
+
+  - name: wait until consul healthy
+    when: consul_running.rc == 1
+    shell: consul members
+    register: consul_members
+    until: consul_members.stdout_lines | count == 7
+    changed_when: False
+
+  # - name: install supervisord
+  #   pip:
+  #     name: supervisor
+  # - name: set supervisord config
+  #   copy:
+  #     src: supervisord.conf
+  #     dest: /etc/supervisord.conf
+  #   register: supervisord_config
+  # - name: kill supervisord
+  #   when: supervisord_config.changed
+  #   shell: pkill supervisor || true
+
+  # - name: check if supervisord is running
+  #   shell: "pgrep supervisord"
+  #   register: supervisord_running
+  #   failed_when: supervisord_running.rc > 1
+  #   changed_when: supervisord_running.rc == 1
+  # - name: start supervisord
+  #   shell: supervisord -c /etc/supervisord.conf
+  #   when: supervisord_running.rc == 1
+
+# - hosts: readout_unit_hosts
+#   tasks:
+#   - name: install daq_application_manager
+#     copy:
+#       src: ../daq-application-manager
+#       dest: /etc/daq-application-manager
+
+# - hosts: management_plane
+#   tasks:
+#   - name: install 

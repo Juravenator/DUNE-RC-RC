@@ -1,0 +1,10 @@
+datacenter = "dune-rc"
+data_dir = "/opt/consul"
+encrypt = "6ImG9FfJqYdK3mTnhcFdQeEe9zjije7+eQ71S0m1608="
+ca_file = "/etc/consul.d/consul-agent-ca.pem"
+cert_file = "/etc/consul.d/consul.pem"
+key_file = "/etc/consul.d/consul-key.pem"
+verify_incoming = true
+verify_outgoing = true
+verify_server_hostname = true
+retry_join = ["dune-rc-march-gp-1"]
