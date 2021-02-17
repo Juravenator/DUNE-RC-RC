@@ -1,0 +1,8 @@
+datacenter = "dune-rc"
+
+data_dir = "/opt/nomad/data"
+
+server {
+  enabled          = true
+  bootstrap_expect = {{ groups['general_purpose_hosts'] | length }}
+}

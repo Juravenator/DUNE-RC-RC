@@ -1,11 +1,7 @@
-# - hosts: consul
-#   vars:
-#     ansible_python_interpreter: /usr/bin/python
-#   roles:
-#     - andrewrothstein.consul-cluster
-
 # consul installation docs:
 # https://learn.hashicorp.com/tutorials/consul/deployment-guide?in=consul/production-deploy
+# nomad installation docs:
+# https://learn.hashicorp.com/tutorials/nomad/clustering?in=nomad/manage-clusters
 
 - hosts: all
   tasks:
@@ -16,6 +12,7 @@
     yum:
       name:
       - unzip
+      - iproute
       state: present
   - name: download consul
     get_url:
@@ -85,34 +82,47 @@
     until: consul_members.stdout_lines | count == 7
     changed_when: False
 
-  # - name: install supervisord
-  #   pip:
-  #     name: supervisor
-  # - name: set supervisord config
-  #   copy:
-  #     src: supervisord.conf
-  #     dest: /etc/supervisord.conf
-  #   register: supervisord_config
-  # - name: kill supervisord
-  #   when: supervisord_config.changed
-  #   shell: pkill supervisor || true
+  - name: download nomad
+    get_url:
+      url: https://releases.hashicorp.com/nomad/1.0.3/nomad_1.0.3_linux_amd64.zip
+      dest: /tmp/nomad.zip
+    register: nomad_zip
 
-  # - name: check if supervisord is running
-  #   shell: "pgrep supervisord"
-  #   register: supervisord_running
-  #   failed_when: supervisord_running.rc > 1
-  #   changed_when: supervisord_running.rc == 1
-  # - name: start supervisord
-  #   shell: supervisord -c /etc/supervisord.conf
-  #   when: supervisord_running.rc == 1
+  - name: install nomad
+    unarchive:
+      src: /tmp/nomad.zip
+      dest: /usr/bin
+      copy: no
+    when: nomad_zip.changed
+  - name: make nomad config directory
+    file:
+      path: /etc/nomad.d
+      state: directory
 
-# - hosts: readout_unit_hosts
-#   tasks:
-#   - name: install daq_application_manager
-#     copy:
-#       src: ../daq-application-manager
-#       dest: /etc/daq-application-manager
 
-# - hosts: management_plane
-#   tasks:
-#   - name: install 
+- hosts: general_purpose_hosts
+  tasks:
+  - name: copy nomad server config
+    template:
+      src: nomad/server.hcl.template
+      dest: /etc/nomad.d/config.hcl
+
+
+- hosts: readout_unit_hosts
+  tasks:
+  - name: copy nomad client config
+    template:
+      src: nomad/client.hcl.template
+      dest: /etc/nomad.d/config.hcl
+
+- hosts: all
+  tasks:
+  - name: check if nomad is running
+    shell: "pgrep nomad"
+    register: nomad_running
+    failed_when: nomad_running.rc > 1
+    changed_when: nomad_running.rc == 1
+  
+  - name: start nomad
+    when: nomad_running.rc == 1
+    shell: nohup /usr/bin/nomad agent -config=/etc/nomad.d/config.hcl </dev/null >/dev/null 2>&1 &
