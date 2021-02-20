@@ -1,3 +1,7 @@
-client_addr = "127.0.0.1"
+client_addr = "0.0.0.0"
 server = true
-bootstrap_expect = {{ groups['general_purpose_hosts'] | length }}
+bootstrap_expect = {{ groups['raft_servers'] | length }}
+
+ui_config = {
+  enabled = true
+}

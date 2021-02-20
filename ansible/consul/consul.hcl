@@ -7,4 +7,4 @@ key_file = "/etc/consul.d/consul-key.pem"
 verify_incoming = true
 verify_outgoing = true
 verify_server_hostname = true
-retry_join = ["dune-rc-march-gp-1"]
+retry_join = ["dune-rc-march-raft-1"]

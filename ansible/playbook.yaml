@@ -37,30 +37,30 @@
       src: consul/consul.hcl
       dest: /etc/consul.d/
 
-- hosts: general_purpose_hosts
+- hosts: raft_servers
   tasks:
   - name: copy consul server keys
     copy:
-      src: consul/dune-rc-server-consul-{{ inventory_hostname | regex_replace('dune-rc-march-gp-', '') }}-key.pem
+      src: consul/dune-rc-server-consul-{{ inventory_hostname | regex_replace('dune-rc-march-raft-', '') }}-key.pem
       dest: /etc/consul.d/consul-key.pem
   - name: copy consul server certs
     copy:
-      src: consul/dune-rc-server-consul-{{ inventory_hostname | regex_replace('dune-rc-march-gp-', '') }}.pem
+      src: consul/dune-rc-server-consul-{{ inventory_hostname | regex_replace('dune-rc-march-raft-', '') }}.pem
       dest: /etc/consul.d/consul.pem
   - name: copy consul server config
     template:
       src: consul/server.hcl.template
       dest: /etc/consul.d/server.hcl
 
-- hosts: readout_unit_hosts
+- hosts: all:!raft_servers
   tasks:
   - name: copy consul client keys
     copy:
-      src: consul/dune-rc-client-consul-{{ inventory_hostname | regex_replace('dune-rc-march-ru-', '') }}-key.pem
+      src: consul/dune-rc-client-consul-{{ inventory_hostname | regex_replace('dune-rc-march-', '') }}-key.pem
       dest: /etc/consul.d/consul-key.pem
   - name: copy consul client certs
     copy:
-      src: consul/dune-rc-client-consul-{{ inventory_hostname | regex_replace('dune-rc-march-ru-', '') }}.pem
+      src: consul/dune-rc-client-consul-{{ inventory_hostname | regex_replace('dune-rc-march-', '') }}.pem
       dest: /etc/consul.d/consul.pem
 
 - hosts: all
@@ -77,9 +77,9 @@
 
   - name: wait until consul healthy
     when: consul_running.rc == 1
-    shell: consul members
+    shell: consul members | wc -l
     register: consul_members
-    until: consul_members.stdout_lines | count == 7
+    until: consul_members.stdout_lines == 7
     changed_when: False
 
   - name: download nomad
@@ -100,7 +100,7 @@
       state: directory
 
 
-- hosts: general_purpose_hosts
+- hosts: raft_servers
   tasks:
   - name: copy nomad server config
     template:
@@ -108,7 +108,7 @@
       dest: /etc/nomad.d/config.hcl
 
 
-- hosts: readout_unit_hosts
+- hosts: all:!raft_servers
   tasks:
   - name: copy nomad client config
     template:

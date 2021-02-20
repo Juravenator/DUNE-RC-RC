@@ -1,19 +1,46 @@
 version: "3"
 
 services:
+  # readout unit PCs
+  # we pretend these have APA RU cards attached
   dune-rc-march-ru-1:
     image: dune-rc-march-ssh-server
+    privileged: true
   dune-rc-march-ru-2:
     image: dune-rc-march-ssh-server
+    privileged: true
   dune-rc-march-ru-3:
     image: dune-rc-march-ssh-server
+    privileged: true
+
+  # general purpose PCs
+  # no special hardware
   dune-rc-march-gp-1:
     image: dune-rc-march-ssh-server
+    privileged: true
   dune-rc-march-gp-2:
     image: dune-rc-march-ssh-server
+    privileged: true
   dune-rc-march-gp-3:
     image: dune-rc-march-ssh-server
+    privileged: true
 
+  # raft leaders
+  # recommended to be dedicated compute units
+  # and a docker image doesn't cost much
+  dune-rc-march-raft-1:
+    image: dune-rc-march-ssh-server
+    ports:
+    # consul ui
+    - 8500:8500
+    # nomad ui
+    - 4646:4646
+  dune-rc-march-raft-2:
+    image: dune-rc-march-ssh-server
+  dune-rc-march-raft-3:
+    image: dune-rc-march-ssh-server
+
+  # where we will run ansible from
   ansible:
     image: dune-rc-march-ansible
     volumes:
