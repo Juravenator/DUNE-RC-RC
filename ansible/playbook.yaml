@@ -76,11 +76,12 @@
     shell: nohup /usr/bin/consul agent -config-dir=/etc/consul.d/ </dev/null >/dev/null 2>&1 &
 
   - name: wait until consul healthy
-    when: consul_running.rc == 1
     shell: consul members | wc -l
     register: consul_members
-    until: consul_members.stdout_lines == 7
+    until: consul_members.stdout == "10"
     changed_when: False
+    retries: 90
+    delay: 1
 
   - name: download nomad
     get_url:
@@ -126,3 +127,21 @@
   - name: start nomad
     when: nomad_running.rc == 1
     shell: nohup /usr/bin/nomad agent -config=/etc/nomad.d/config.hcl </dev/null >/dev/null 2>&1 &
+
+- hosts: controllers_host
+  tasks:
+  - name: make ccm install directory
+    file:
+      path: /opt/dune/ccm-rc
+      state: directory
+  - name: install controllers
+    register: controllers
+    synchronize:
+      src: ../controllers
+      dest: /opt/dune/ccm-rc
+  - name: stop daq-application-manager
+    when: controllers.changed
+    shell: nomad stop daq-application-manager || true
+  - name: start daq-application-manager
+    shell: nomad job run /opt/dune/ccm-rc/controllers/daq-app-manager/nomad.hcl
+    changed_when: False

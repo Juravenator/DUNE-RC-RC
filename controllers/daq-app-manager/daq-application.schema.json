@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "spec"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "kind": {
+          "const": "daq-application"
+        },
+        "name": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        }
+      }
+    },
+
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run-number", "configkey"],
+      "properties": {
+        "run-number": {
+          "type": "string"
+        },
+        "configkey": {
+          "type": "string"
+        }
+      }
+    },
+
+    "status": {
+      "type": "object"
+    }
+  }
+}

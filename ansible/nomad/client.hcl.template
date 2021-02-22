@@ -11,15 +11,21 @@ client {
   {% endif %}
 
   meta {
-    {% if inventory_hostname.startswith("dune-rc-march-ru-1") -%}
-    mod-a-tpc-apa-42 = 1
-    mod-a-tpc-apa-43 = 1
-    mod-a-pu-apas = "42-51"
+    {% if inventory_hostname.startswith("dune-rc-march-gp-1") -%}
+    ccm-rc-controllers-installed = "daq-application-manager"
     {% endif %}
 
     {% if inventory_hostname.startswith("dune-rc-march-ru-1") -%}
-    mod-a-tpc-apa-44 = 1
-    mod-a-tpc-apa-45 = 1
+    module-a-tpc-apa = "42,43"
+    module-a-pu-apas = "42-51,52-61"
+    {% endif %}
+
+    {% if inventory_hostname.startswith("dune-rc-march-ru-2") -%}
+    module-a-tpc-apa = "44,45"
+    {% endif %}
+
+    {% if inventory_hostname.startswith("dune-rc-march-ru-3") -%}
+    module-a-tpc-apa = "46,47,48"
     {% endif %}
   }
 }
@@ -27,5 +33,6 @@ client {
 plugin "raw_exec" {
   config {
     enabled = true
+    no_cgroups = true
   }
 }

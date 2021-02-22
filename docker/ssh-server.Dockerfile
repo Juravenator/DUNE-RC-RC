@@ -1,6 +1,6 @@
 FROM dunedaq/sl7-minimal
 
-RUN yum install -y openssh-server python3-pip vim && \
+RUN yum install -y openssh-server python3-pip vim make && \
     python3 -m pip install --upgrade pip && \
     yum clean all
 
