@@ -13,6 +13,11 @@
       name:
       - unzip
       - iproute
+      - vim
+      - make
+      - git
+      - gcc-c++
+      - redhat-lsb-core
       state: present
   - name: download consul
     get_url:
@@ -36,6 +41,14 @@
     copy:
       src: consul/consul.hcl
       dest: /etc/consul.d/
+
+- hosts: cvmfs_capable_hosts
+  tasks:
+  - name: install daq-buildtools
+    git:
+      repo: https://github.com/DUNE-DAQ/daq-buildtools.git
+      dest: /opt/dune/daq-buildtools
+      version: dunedaq-v2.2.0
 
 - hosts: raft_servers
   tasks:
@@ -145,3 +158,5 @@
   - name: start daq-application-manager
     shell: nomad job run /opt/dune/ccm-rc/controllers/daq-app-manager/nomad.hcl
     changed_when: False
+    retries: 10
+    delay: 5

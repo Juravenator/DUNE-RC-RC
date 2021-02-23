@@ -6,7 +6,7 @@
     "meta": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name"],
+      "required": ["name", "kind"],
       "properties": {
         "kind": {
           "const": "daq-application"
@@ -23,13 +23,23 @@
     "spec": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["run-number", "configkey"],
+      "required": ["run-number", "configkey", "enabled", "desired-state"],
       "properties": {
         "run-number": {
           "type": "string"
         },
+        "daq-service": {
+          "type": "string"
+        },
         "configkey": {
           "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "desired-state": {
+          "type": "string",
+          "enum": ["running"]
         }
       }
     },

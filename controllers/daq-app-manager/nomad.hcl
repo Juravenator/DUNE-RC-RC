@@ -17,7 +17,7 @@ job "daq-application-manager" {
       driver = "raw_exec"
       config {
         command = "/bin/bash"
-        args    = ["-c", "/opt/dune/ccm-rc/controllers/daq-app-manager/start.sh"]
+        args    = ["/opt/dune/ccm-rc/controllers/daq-app-manager/start.sh"]
       }
       constraint {
         attribute    = "${meta.ccm-rc-controllers-installed}"

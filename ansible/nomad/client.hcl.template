@@ -11,6 +11,10 @@ client {
   {% endif %}
 
   meta {
+    {% if inventory_hostname.startswith("dune-rc-march-ru") -%}
+    cvmfs = "/cvmfs"
+    {% endif %}
+
     {% if inventory_hostname.startswith("dune-rc-march-gp-1") -%}
     ccm-rc-controllers-installed = "daq-application-manager"
     {% endif %}

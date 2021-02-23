@@ -21,3 +21,7 @@ all:
     controllers_host:
       hosts:
         dune-rc-march-gp-1:
+
+    cvmfs_capable_hosts:
+      hosts:
+        dune-rc-march-ru-[1:3]:

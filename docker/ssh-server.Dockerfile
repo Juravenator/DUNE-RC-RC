@@ -1,9 +1,11 @@
 FROM dunedaq/sl7-minimal
 
-RUN yum install -y openssh-server python3-pip vim make && \
+# an up to date python setup and ssh server
+RUN yum install -y openssh-server python3-pip && \
     python3 -m pip install --upgrade pip && \
     yum clean all
 
+# setup pre-defined keys for convenience
 ADD ssh.key.pub /root/.ssh/authorized_keys
 ADD ssh.key /root/.ssh/id_rsa
 ADD sshd_config /etc/ssh/sshd_config
