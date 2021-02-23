@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "kind": "daq-application",
+    "name": "my-first-daq-app",
+    "owner": ""
+  },
+  "spec": {
+    "daq-service": "daq-ru-pu-52-51-api",
+    "run-number": "123",
+    "configkey": "/daq-applications/configs/my-first-config",
+    "enabled": true,
+    "desired-state": "running"
+  }
+}

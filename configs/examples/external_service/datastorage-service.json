@@ -1,0 +1,10 @@
+{
+  "Node": "fake",
+  "SkipNodeUpdate": true,
+  "Service": {
+    "ID": "datastorage1",
+    "Service": "datastorage",
+    "Port": 8080,
+    "Address": "192.168.0.15"
+  }
+}

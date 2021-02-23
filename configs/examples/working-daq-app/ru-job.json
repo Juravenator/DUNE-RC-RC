@@ -1,0 +1,49 @@
+{
+  "job": [
+    {
+      "daq-ru-pu-52-51": [
+        {
+          "datacenters": ["dune-rc"],
+          "group": [
+            {
+              "daq-ru": [
+                {
+                  "network": [{"port": [{"api": [{}]}]}],
+                  "service": [{"name": "daq-ru-pu-52-51-api", "port": "api"}],
+                  "task": [
+                    {
+                      "daq-application": [
+                        {
+                          "config": [
+                            {
+                              "args": [
+                                "/dune-rc/hacks/daq-app-starter.sh",
+                                "--commandFacility",
+                                "rest://localhost:${NOMAD_PORT_api}"
+                              ],
+                              "command": "bash"
+                            }
+                          ],
+                          "constraint": [
+                            {
+                              "attribute": "${meta.module-a-pu-apas}",
+                              "set_contains": "42-51"
+                            },
+                            {"attribute": "${meta.cvmfs}", "value": "/cvmfs"}
+                          ],
+                          "driver": "raw_exec"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "type": "service",
+          "update": [{"max_parallel": 1}]
+        }
+      ]
+    }
+  ]
+}

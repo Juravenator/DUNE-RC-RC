@@ -1,0 +1,42 @@
+{
+  "job": [
+    {
+      "example-job": [
+        {
+          "datacenters": ["dune-rc"],
+          "group": [
+            {
+              "my-app": [
+                {
+                  "network": [{"port": [{"api": [{}]}]}],
+                  "service": [{"port": "api"}],
+                  "task": [
+                    {
+                      "my-app": [
+                        {
+                          "config": [
+                            {
+                              "args": [
+                                "-m",
+                                "http.server",
+                                "${NOMAD_PORT_api}"
+                              ],
+                              "command": "/usr/bin/python3"
+                            }
+                          ],
+                          "driver": "raw_exec"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "type": "service",
+          "update": [{"max_parallel": 1}]
+        }
+      ]
+    }
+  ]
+}
