@@ -1,49 +1,38 @@
 {
-  "job": [
-    {
-      "daq-ru-pu-52-51": [
-        {
-          "datacenters": ["dune-rc"],
-          "group": [
-            {
-              "daq-ru": [
-                {
-                  "network": [{"port": [{"api": [{}]}]}],
-                  "service": [{"name": "daq-ru-pu-52-51-api", "port": "api"}],
-                  "task": [
-                    {
-                      "daq-application": [
-                        {
-                          "config": [
-                            {
-                              "args": [
-                                "/dune-rc/hacks/daq-app-starter.sh",
-                                "--commandFacility",
-                                "rest://localhost:${NOMAD_PORT_api}"
-                              ],
-                              "command": "bash"
-                            }
-                          ],
-                          "constraint": [
-                            {
-                              "attribute": "${meta.module-a-pu-apas}",
-                              "set_contains": "42-51"
-                            },
-                            {"attribute": "${meta.cvmfs}", "value": "/cvmfs"}
-                          ],
-                          "driver": "raw_exec"
-                        }
-                      ]
-                    }
-                  ]
-                }
+  "Job": {
+    "Datacenters": ["dune-rc"],
+    "ID": "daq-ru-pu-52-51",
+    "Name": "daq-ru-pu-52-51",
+    "TaskGroups": [
+      {
+        "Migrate": {"MaxParallel": 1},
+        "Name": "daq-ru",
+        "Networks": [{"DynamicPorts": [{"Label": "api"}]}],
+        "Services": [{"Name": "daq-ru-pu-52-51-api", "PortLabel": "api"}],
+        "Tasks": [
+          {
+            "Config": {
+              "command": "bash",
+              "args": [
+                "/dune-rc/hacks/daq-app-starter.sh",
+                "--commandFacility",
+                "rest://localhost:${NOMAD_PORT_api}"
               ]
-            }
-          ],
-          "type": "service",
-          "update": [{"max_parallel": 1}]
-        }
-      ]
-    }
-  ]
+            },
+            "Constraints": [
+              {
+                "LTarget": "${meta.module-a-pu-apas}",
+                "Operand": "set_contains",
+                "RTarget": "42-51"
+              },
+              {"LTarget": "${meta.cvmfs}", "Operand": "=", "RTarget": "/cvmfs"}
+            ],
+            "Driver": "raw_exec",
+            "Name": "daq-application"
+          }
+        ]
+      }
+    ],
+    "Type": "service"
+  }
 }

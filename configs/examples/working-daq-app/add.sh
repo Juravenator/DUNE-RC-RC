@@ -12,10 +12,13 @@ cd `dirname "${BASH_SOURCE[0]:-$0}"`
 ../external_service/add.sh
 
 # schedule a daq application with nomad (process manager & scheduler)
-curl -X POST --data @ru-job.json http://localhost:4646/v1/jobs
+curl -X POST --fail --data @ru-job.json http://localhost:4646/v1/jobs
+echo ""
 
 # put the desired daq config template in the raft key-value store
-curl -X PUT --data @my-first-config-config.json 'http://localhost:8500/v1/kv/daq-applications/configs/my-first-config'
+curl -X PUT --fail --data @my-first-config.json 'http://localhost:8500/v1/kv/daq-applications/configs/my-first-config'
+echo ""
 
 # register a config with daq-app-manager
-curl -X PUT --data @my-first-daq-app.json 'http://localhost:8500/v1/kv/daq-applications/my-first-daq-app'
+curl -X PUT --fail --data @my-first-daq-app.json 'http://localhost:8500/v1/kv/daq-applications/my-first-daq-app'
+echo ""
