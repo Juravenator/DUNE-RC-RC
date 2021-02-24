@@ -23,10 +23,19 @@ dbt-setup-build-environment
 cd sourcecode
 >&2 echo "-> restcmd"
 git clone https://github.com/DUNE-DAQ/restcmd.git
+cd restcmd
+git checkout 5c4893ca7b97507bf27783c06fad872fd6d2be8a
+cd ..
 >&2 echo "-> cmdlib"
 git clone https://github.com/DUNE-DAQ/cmdlib.git
+cd cmdlib
+git checkout 3090bea4a8508881adaef491906d6157c204a02c
+cd ..
 >&2 echo "-> appfwk"
 git clone https://github.com/DUNE-DAQ/appfwk.git
+cd appfwk
+git checkout 8f6528daea861882332028e0ff41bdff80cc9f88
+cd ..
 
 >&2 echo "building code"
 dbt-build.sh --clean --install
