@@ -1,2 +1,2 @@
 from .waitForUpdate import waitForUpdate
-from .manage import manage
+from .manage import manageAndUpdate

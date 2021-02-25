@@ -1,0 +1,68 @@
+[{
+  "id": "init",
+  "data": {
+    "modules": [{
+      "data": {
+        "qinfos": [
+            {
+                "dir": "input",
+                "inst": "trigger_record_q",
+                "name": "trigger_record_input_queue"
+            },
+            {
+                "dir": "output",
+                "inst": "trigger_inhibit_q",
+                "name": "trigger_inhibit_output_queue"
+            }
+        ]
+    },
+    "inst": "datawriter",
+    "plugin": "DataWriter"
+    }],
+    "queues": [
+      {
+          "capacity": 20,
+          "inst": "trigger_decision_q",
+          "kind": "FollySPSCQueue"
+      }, {
+          "capacity": 20,
+          "inst": "trigger_inhibit_q",
+          "kind": "FollySPSCQueue"
+      }, {
+          "capacity": 20,
+          "inst": "trigger_record_q",
+          "kind": "FollySPSCQueue"
+      }
+    ]
+  }
+}, {
+  "id": "conf",
+  "data": {
+    "modules": [
+      {
+        "data": {
+          "trigger_offset": "{{ or (env \"TRIGGER_OFFSET\") 0 }}"
+        },
+        "match": "tde"
+      }, {
+        "data": {
+          "send-to": "{{ with firstServiceAddr \"datastorage\" }}{{ .Address }}:{{ .Port }}{{ end }}"
+        },
+        "trigger_offset": 0,
+        "match": "datawriter"
+      }
+    ]
+  }
+}, {
+  "id": "start",
+  "data": {
+    "modules": [
+      {
+        "data": {
+            "run": "{{ .RunNumber }}"
+        },
+        "match": "datawriter"
+      }
+    ]
+  }
+}]

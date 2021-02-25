@@ -6,14 +6,15 @@
 import asyncio
 import logging
 import time
-from lib import waitForUpdate, manage
+from lib import waitForUpdate, manageAndUpdate
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('main')
 
 async def main():
   lastChangeID = 0
+  rerunTimeOverride = None
   while True:
-    daqAppKeys, changeID, err = waitForUpdate(lastChangeID)
+    daqAppKeys, changeID, err = waitForUpdate(lastChangeID, rerunTimeOverride)
     if err is not None:
       time.sleep(5)
       continue
@@ -27,7 +28,7 @@ async def main():
 
     requeueAfter = None
     for key in daqAppKeys:
-      requestedRedos = await asyncio.gather(*[manage(daqAppKey) for daqAppKey in daqAppKeys])
+      requestedRedos = await asyncio.gather(*[manageAndUpdate(daqAppKey) for daqAppKey in daqAppKeys])
       for r in requestedRedos:
         if r is not None:
           if requeueAfter is None or r < requeueAfter:
@@ -36,8 +37,10 @@ async def main():
     if requeueAfter is None:
       lastChangeID = changeID
       log.info("all daq apps are up to date (%s)", changeID)
+      rerunTimeOverride = None
     else:
-      log.info("not all daq apps ready, rerunningin %ds", requeueAfter)
+      log.info("not all daq apps ready, rerunnining %ds", requeueAfter)
+      rerunTimeOverride = requeueAfter
 
 log.info("starting")
 loop = asyncio.get_event_loop()
