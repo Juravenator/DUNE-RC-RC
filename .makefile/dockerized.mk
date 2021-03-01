@@ -12,8 +12,9 @@ docker.ansible: ## run ansible on docker images
 docker.start: ## start Run Control setup in docker containers
 	docker-compose -f docker/docker-compose.yml up
 
+IMAGE ?= ansible
 docker.bash: ## open a shell in a runner container
-	docker-compose -f docker/docker-compose.yml run --rm --entrypoint "/bin/bash -c" ansible bash
+	docker-compose -f docker/docker-compose.yml run --rm --entrypoint "/bin/bash -c" $(IMAGE) bash
 
 docker.%: ## run any make target in a docker container
 	docker-compose -f .makefile/docker-compose.yml run runner "make $(subst docker.,,$@)"

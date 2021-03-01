@@ -1,3 +1,5 @@
+// get a json version of this by running
+// nomad job inspect daq-ru-pu-52-51
 job "daq-ru-pu-52-51" {
   datacenters = ["dune-rc"]
 
@@ -8,6 +10,10 @@ job "daq-ru-pu-52-51" {
   }
 
   group "daq-ru" {
+
+    restart {
+      attempts = 1
+    }
 
     network {
       port "api" {}

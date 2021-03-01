@@ -1,5 +1,5 @@
 ##
-### help
+### Help
 ##
 
 .PHONY: help

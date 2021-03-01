@@ -41,6 +41,8 @@ cd ..
 dbt-build.sh --clean --install
 dbt-setup-runtime-environment
 
+set -o errexit -o nounset -o pipefail
+
 >&2 echo "starting"
 # exec daq_application --commandFacility rest://localhost:12345
-exec daq_application "$@"
+daq_application "$@"

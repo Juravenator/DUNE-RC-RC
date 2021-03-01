@@ -1,12 +1,12 @@
 SHELL:=/bin/bash
 .DEFAULT_GOAL := help
 
-#
-## main targets
-#
+##
+### Main targets
+##
 
 .PHONY: build
-build:
+build: ## build the software
 	make -C controllers/daq-app-manager build
 
 include .makefile/dockerized.mk
