@@ -8,7 +8,7 @@
     "daq-service": "daq-process-a",
     "run-number": "123",
     "configkey": "/daq-configs/my-first-config",
-    "enabled": true,
+    "enabled": false,
     "desired-state": "running"
   }
 }
