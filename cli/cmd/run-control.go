@@ -3,9 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"strings"
 	"time"
 
+	"cli.rc.ccm.dunescience.org/daq"
 	"cli.rc.ccm.dunescience.org/internal"
 
 	"github.com/rs/zerolog"
@@ -61,16 +64,15 @@ func main() {
 						if err != nil {
 							return err
 						}
+						fmt.Fprintln(c.App.Writer, "KIND\t\tNAME")
 						for _, kind := range kinds {
-							fmt.Fprintln(c.App.Writer, "KEY")
 							keys, err := internal.GetAllKeys(&rcConfig, kind)
 							if err != nil {
 								return err
 							}
 							for _, key := range keys {
-								fmt.Fprintln(c.App.Writer, kind+"s/"+key)
+								fmt.Fprintln(c.App.Writer, kind+"\t"+key)
 							}
-							fmt.Fprintln(c.App.Writer, "")
 						}
 						return nil
 					}
@@ -88,7 +90,7 @@ func main() {
 					}
 
 					// fetch and print specific resource
-					obj, err := internal.GetResource(&rcConfig, kind, id)
+					obj, err := internal.GetResource(&rcConfig, internal.Kind(kind), id)
 					if err != nil {
 						return err
 					}
@@ -109,17 +111,28 @@ func main() {
 					if l == 0 {
 						return fmt.Errorf("no files given")
 					}
-					filenames := []string{}
+					resources := []internal.GenericResource{}
 					for i := 0; i < l; i++ {
 						fn := c.Args().Get(i)
-						log.Debug().Str("file", fn).Msg("checking filename")
-						_, err := os.Stat(fn)
+						log.Debug().Str("file", fn).Msg("reading file")
+						f, err := os.Open(fn)
 						if err != nil {
 							return err
 						}
-						filenames = append(filenames, fn)
+						bytes, err := ioutil.ReadAll(f)
+						if err != nil {
+							return err
+						}
+						log.Trace().RawJSON("job", bytes).Msg("parsing file")
+						var parsed internal.GenericResource
+						err = json.Unmarshal(bytes, &parsed)
+						if err != nil {
+							return err
+						}
+						resources = append(resources, parsed)
 					}
-					err := internal.Apply(c.App.Writer, &rcConfig, filenames...)
+
+					err := internal.Apply(c.App.Writer, &rcConfig, resources...)
 					return err
 				},
 			},
@@ -136,6 +149,42 @@ func main() {
 						fmt.Fprintln(c.App.Writer, kind)
 					}
 					return nil
+				},
+			},
+			{
+				Name:  "daq",
+				Usage: "DAQ related commands",
+				Subcommands: []*cli.Command{
+					{
+						Name:      "autonomous",
+						Aliases:   []string{"a"},
+						Usage:     "enable or disable autonomous mode on given daq-apps",
+						ArgsUsage: "isenabled daq-app-names...",
+						Action: func(c *cli.Context) error {
+							rawEnabled := c.Args().Get(0)
+							enabled := false
+							if rawEnabled == "" {
+								return fmt.Errorf("bad usage - no isenabled setting")
+							}
+							if strings.ToLower(rawEnabled) == "false" || strings.ToLower(rawEnabled) == "no" || rawEnabled == "0" {
+								enabled = false
+							} else if strings.ToLower(rawEnabled) == "true" || strings.ToLower(rawEnabled) == "yes" || rawEnabled == "0" {
+								enabled = true
+							} else {
+								return fmt.Errorf("bad usage - invalid isenabled setting")
+							}
+
+							appnames := []string{}
+							for i := 1; c.Args().Get(i) != ""; i++ {
+								appnames = append(appnames, c.Args().Get(i))
+							}
+							err := daq.SetAutonomousMode(c.App.Writer, &rcConfig, enabled, appnames...)
+							if err != nil {
+								return err
+							}
+							return nil
+						},
+					},
 				},
 			},
 		},

@@ -50,6 +50,10 @@ async def manage(daqAppKey, doc):
       # invalid config, wait for config update
       return None
 
+  if "enabled" in doc["spec"] and not doc["spec"]["enabled"]:
+    log.warn("daq app %s is not in autonomous mode", daqAppKey)
+    return None
+
   # are we waiting for a command reply?
   if "lastcommandsent" in doc['status'] and "commandsucceeded" not in doc['status'] and "commandpostfailed" not in doc['status']:
     log.info("waiting for last command to reply...")

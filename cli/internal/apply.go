@@ -8,13 +8,13 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
 )
 
 // GenericResource is the generic structure all resources conform to
 type GenericResource struct {
-	Meta GenericMeta `json:"meta"`
-	Spec GenericSpec `json:"spec"`
+	Meta   GenericMeta `json:"meta"`
+	Spec   GenericSpec `json:"spec"`
+	Status interface{} `json:"status,omitempty"`
 }
 
 // GenericMeta is part of GenericResource
@@ -31,36 +31,23 @@ type Kind string
 
 // known kinds
 const (
-	NomadKind Kind = "nomad-job"
+	NomadKind  Kind = "nomad-job"
+	DAQAppKind Kind = "daq-application"
 )
 
 // Apply given files by name
-func Apply(writer io.Writer, c *RCConfig, filenames ...string) error {
-	log.Debug().Strs("files", filenames).Msg("applying files")
+func Apply(writer io.Writer, c *RCConfig, resources ...GenericResource) error {
+	log.Debug().Msg("applying resources")
 	consulTodo := []GenericResource{}
 	nomadTodo := []GenericSpec{}
-	for _, n := range filenames {
-		f, err := os.Open(n)
-		if err != nil {
-			return err
-		}
-		bytes, err := ioutil.ReadAll(f)
-		if err != nil {
-			return err
-		}
-		log.Trace().RawJSON("job", bytes).Msg("parsing file")
-		var parsed GenericResource
-		err = json.Unmarshal(bytes, &parsed)
-		if err != nil {
-			return err
-		}
-		if parsed.Meta.Kind == NomadKind {
-			if parsed.Meta.Name != parsed.Spec["ID"] || parsed.Spec["ID"] != parsed.Spec["Name"] {
-				return fmt.Errorf("meta.name should equal spec.Name and spec.ID, got '%s', '%s', '%s'", parsed.Meta.Name, parsed.Spec["Name"], parsed.Spec["ID"])
+	for _, r := range resources {
+		if r.Meta.Kind == NomadKind {
+			if r.Meta.Name != r.Spec["ID"] || r.Spec["ID"] != r.Spec["Name"] {
+				return fmt.Errorf("meta.name should equal spec.Name and spec.ID, got '%s', '%s', '%s'", r.Meta.Name, r.Spec["Name"], r.Spec["ID"])
 			}
-			nomadTodo = append(nomadTodo, parsed.Spec)
+			nomadTodo = append(nomadTodo, r.Spec)
 		} else {
-			consulTodo = append(consulTodo, parsed)
+			consulTodo = append(consulTodo, r)
 		}
 	}
 	log.Debug().Int("consuljobs", len(consulTodo)).Int("nomadjobs", len(nomadTodo)).Msg("parsed files")

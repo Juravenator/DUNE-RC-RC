@@ -9,13 +9,13 @@ import (
 )
 
 // GetResource gets the content of a specific resource
-func GetResource(c *RCConfig, kind string, id string) (interface{}, error) {
-	if kind == string(NomadKind) {
+func GetResource(c *RCConfig, kind Kind, id string) (*GenericResource, error) {
+	if kind == NomadKind {
 		return GetNomadJob(c, id)
 	}
 
 	url := fmt.Sprintf("http://%s:%d/v1/kv/%ss/%s?raw=", c.Host, c.ConsulPort, kind, id)
-	log.Debug().Str("url", url).Str("kind", kind).Str("id", id).Msg("fetching key")
+	log.Debug().Str("url", url).Str("kind", string(kind)).Str("id", id).Msg("fetching key")
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -30,12 +30,12 @@ func GetResource(c *RCConfig, kind string, id string) (interface{}, error) {
 		return nil, fmt.Errorf("no such resource exists")
 	}
 
-	var parsed interface{}
+	var parsed GenericResource
 	err = json.Unmarshal(body, &parsed)
 	if err != nil {
 		return nil, err
 	}
-	return parsed, nil
+	return &parsed, nil
 }
 
 // GetAllKeys gives all keys from a given kind
@@ -57,7 +57,7 @@ func GetAllKeys(c *RCConfig, kind string) ([]string, error) {
 	}
 	log.Trace().Bytes("body", body).Msg("received response")
 	if len(body) == 0 {
-		return nil, fmt.Errorf("no such kind exists")
+		return []string{}, nil
 	}
 
 	var parsed []string

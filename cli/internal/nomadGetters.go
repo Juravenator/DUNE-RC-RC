@@ -7,13 +7,6 @@ import (
 	"net/http"
 )
 
-// NomadWrapper wraps around a bare nomad job for consistency
-type NomadWrapper struct {
-	Meta   GenericMeta        `json:"meta"`
-	Spec   GenericSpec        `json:"spec"`
-	Status NomadWrapperStatus `json:"status,omitempty"`
-}
-
 // NomadKindType to hardcode kind
 type NomadKindType string
 
@@ -56,7 +49,7 @@ func GetAllNomadJobs(c *RCConfig) ([]string, error) {
 }
 
 // GetNomadJob gives a given jobs configuration
-func GetNomadJob(c *RCConfig, id string) (*NomadWrapper, error) {
+func GetNomadJob(c *RCConfig, id string) (*GenericResource, error) {
 	url := fmt.Sprintf("http://%s:%d/v1/job/%s", c.Host, c.NomadPort, id)
 	log.Debug().Str("url", url).Str("id", id).Msg("fetching all keys")
 	resp, err := http.Get(url)
@@ -79,7 +72,7 @@ func GetNomadJob(c *RCConfig, id string) (*NomadWrapper, error) {
 		return nil, err
 	}
 
-	result := NomadWrapper{
+	result := GenericResource{
 		Meta: GenericMeta{
 			Kind: NomadKind,
 			Name: id,
