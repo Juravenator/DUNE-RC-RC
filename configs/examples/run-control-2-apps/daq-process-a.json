@@ -1,0 +1,83 @@
+{
+  "meta": {
+    "kind": "nomad-job",
+    "name": "daq-process-a"
+  },
+  "spec": {
+    "Datacenters": [
+      "dune-rc"
+    ],
+    "Dispatched": false,
+    "ID": "daq-process-a",
+    "Name": "daq-process-a",
+    "TaskGroups": [
+      {
+        "Name": "daq-ru",
+        "Networks": [
+          {
+            "CIDR": "",
+            "Device": "",
+            "DynamicPorts": [
+              {
+                "HostNetwork": "",
+                "Label": "api",
+                "To": 0,
+                "Value": 0
+              }
+            ],
+            "IP": "",
+            "Mode": ""
+          }
+        ],
+        "RestartPolicy": {
+          "Attempts": 1
+        },
+        "Services": [
+          {
+            "AddressMode": "",
+            "EnableTagOverride": false,
+            "Id": "",
+            "Name": "daq-process-a",
+            "PortLabel": "api",
+            "TaskName": ""
+          }
+        ],
+        "Tasks": [
+          {
+            "Config": {
+              "args": [
+                "/dune-rc/hacks/daq-app-starter.sh",
+                "--commandFacility",
+                "rest://localhost:${NOMAD_PORT_api}"
+              ],
+              "command": "bash"
+            },
+            "Constraints": [
+              {
+                "LTarget": "${meta.module-a-tpc-apa}",
+                "Operand": "set_contains",
+                "RTarget": "42"
+              },
+              {
+                "LTarget": "${meta.cvmfs}",
+                "Operand": "=",
+                "RTarget": "/cvmfs"
+              }
+            ],
+            "Driver": "raw_exec",
+            "KillSignal": "",
+            "Kind": "",
+            "Leader": false,
+            "Name": "daq-application",
+            "ShutdownDelay": 0,
+            "User": ""
+          }
+        ]
+      }
+    ],
+    "Type": "service",
+    "Update": {
+      "MaxParallel": 1
+    }
+  }
+}
