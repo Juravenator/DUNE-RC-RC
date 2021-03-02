@@ -11,7 +11,7 @@
   
   - name: start consul
     when: consul_running.rc == 1
-    shell: nohup /usr/bin/consul agent -dev -client=0.0.0.0 </dev/null >/dev/null 2>&1 &
+    shell: nohup /usr/bin/consul agent -dev -client=0.0.0.0 -datacenter=dune-rc </dev/null >/dev/null 2>&1 &
 
   - name: copy nomad config
     template:
