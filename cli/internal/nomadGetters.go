@@ -7,27 +7,15 @@ import (
 	"net/http"
 )
 
-// NomadJob (very lazily) describes a Nomad Job object
-type NomadJob map[string]interface{}
-
 // NomadWrapper wraps around a bare nomad job for consistency
 type NomadWrapper struct {
-	Meta   NomadWrapperMeta   `json:"meta"`
-	Spec   NomadJob           `json:"spec"`
+	Meta   GenericMeta        `json:"meta"`
+	Spec   GenericSpec        `json:"spec"`
 	Status NomadWrapperStatus `json:"status,omitempty"`
 }
 
 // NomadKindType to hardcode kind
 type NomadKindType string
-
-// NomadKind hardcodes nomad kind
-const NomadKind NomadKindType = "nomad-job"
-
-// NomadWrapperMeta is part of NomadWrapper
-type NomadWrapperMeta struct {
-	Kind NomadKindType `json:"kind"`
-	Name string        `json:"name"`
-}
 
 // NomadWrapperStatus is part of NomadWrapper
 type NomadWrapperStatus struct {
@@ -54,7 +42,7 @@ func GetAllNomadJobs(c *RCConfig) ([]string, error) {
 		return nil, fmt.Errorf("no such kind exists")
 	}
 
-	var parsed []NomadJob
+	var parsed []GenericSpec
 	err = json.Unmarshal(body, &parsed)
 	if err != nil {
 		return nil, err
@@ -85,14 +73,14 @@ func GetNomadJob(c *RCConfig, id string) (*NomadWrapper, error) {
 		return nil, fmt.Errorf("no such job exists")
 	}
 
-	var parsed NomadJob
+	var parsed GenericSpec
 	err = json.Unmarshal(body, &parsed)
 	if err != nil {
 		return nil, err
 	}
 
 	result := NomadWrapper{
-		Meta: NomadWrapperMeta{
+		Meta: GenericMeta{
 			Kind: NomadKind,
 			Name: id,
 		},

@@ -14,7 +14,7 @@ import (
 	"github.com/urfave/cli/v2/altsrc"
 )
 
-var log = logger.With().Str("pkg", "internal").Logger().Output(zerolog.ConsoleWriter{Out: os.Stderr})
+var log = logger.With().Str("pkg", "main").Logger().Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 var rcConfig = internal.RCConfig{}
 
@@ -98,6 +98,29 @@ func main() {
 					}
 					fmt.Fprintln(c.App.Writer, string(json))
 					return nil
+				},
+			},
+			{
+				Name:      "apply",
+				Usage:     "Apply configurations by filename",
+				ArgsUsage: "filename...",
+				Action: func(c *cli.Context) error {
+					l := c.Args().Len()
+					if l == 0 {
+						return fmt.Errorf("no files given")
+					}
+					filenames := []string{}
+					for i := 0; i < l; i++ {
+						fn := c.Args().Get(i)
+						log.Debug().Str("file", fn).Msg("checking filename")
+						_, err := os.Stat(fn)
+						if err != nil {
+							return err
+						}
+						filenames = append(filenames, fn)
+					}
+					err := internal.Apply(c.App.Writer, &rcConfig, filenames...)
+					return err
 				},
 			},
 			{
