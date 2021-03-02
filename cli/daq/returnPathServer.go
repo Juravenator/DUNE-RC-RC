@@ -18,6 +18,7 @@ type ReturnPathHandler struct {
 }
 
 func (h ReturnPathHandler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+	log.Debug().Str("method", req.Method).Str("url", req.URL.String()).Msg("received request")
 	defer func() {
 		go h.server.Shutdown(context.Background())
 	}()

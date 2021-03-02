@@ -94,7 +94,8 @@ func SendCommand(w internal.Writers, c *internal.RCConfig, name string, command 
 	}
 	if daqResponse == nil {
 		fmt.Fprintln(w.Out, "TIMEOUT")
-		*daqResponse = "command timed out"
+		r := "command timed out"
+		daqResponse = &r
 	} else {
 		fmt.Fprintln(w.Out, "FAIL")
 	}
