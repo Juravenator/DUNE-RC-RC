@@ -8,4 +8,4 @@ def getConfigTemplate(key):
   if resp.status_code != 200:
     return None
 
-  return resp.text
+  return resp.json()["spec"]["template"]
