@@ -4,7 +4,7 @@
 ```bash
 $ ssh lxplus #duh
 $ git clone https://github.com/Juravenator/DUNE-RC-RC.git
-$ git checkout <hash>
+$ git checkout march-rc0
 ```
 
 ## Run Run Control in-memory
@@ -47,9 +47,35 @@ nomad-job	daq-process-a
 daq-config	my-first-config
 ```
 
+You can view the status of a daq-application resource
+
+```bash
+$ run-control get daq-application daq-app-a
+{
+  "meta": {
+    "kind": "daq-application",
+    "name": "daq-app-a"
+  },
+  "spec": {
+    "configkey": "/daq-configs/my-first-config",
+    "daq-service": "daq-process-a",
+    "desired-state": "running",
+    "enabled": false,
+    "run-number": "123"
+  },
+  "status": {
+    "configkeyexists": true,
+    "configrendered": true,
+    "daqserviceexists": true
+  }
+}
+```
+
 ### viewing logs
 
 You can traverse the nomad web interface to view stdout and stderr logs (and scheduler logs if you're in hell).
+
+![nomad logs](screenshots/nomad_logs.png)
 
 ## Enabling autonomous mode
 
