@@ -1,0 +1,19 @@
+- name: make ccm install directory
+  file:
+    path: /opt/dune/ccm-rc
+    state: directory
+- name: install controllers
+  register: controllers
+  synchronize:
+    src: ../../controllers
+    dest: /opt/dune/ccm-rc
+    rsync_opts:
+      - "--exclude=venv/"
+- name: stop daq-application-manager
+  when: controllers.changed
+  shell: nomad stop daq-application-manager || true
+- name: start daq-application-manager
+  shell: nomad job run /opt/dune/ccm-rc/controllers/daq-app-manager/nomad.hcl
+  changed_when: False
+  retries: 10
+  delay: 5

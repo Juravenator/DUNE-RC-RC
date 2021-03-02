@@ -1,0 +1,22 @@
+# single host setup
+# UNRECOMMENDED
+version: "3"
+
+services:
+  rc:
+    image: dune-rc-march-ssh-server
+    privileged: true
+    volumes:
+    - ../cvmfs/:/cvmfs
+    - ../:/dune-rc
+    ports:
+    - 8500:8500
+    - 4646:4646
+
+  ansible:
+    image: dune-rc-march-ansible
+    volumes:
+    - ..:/mnt
+    entrypoint: ["ansible-playbook"]
+    deploy:
+      replicas: 0

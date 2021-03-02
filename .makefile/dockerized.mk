@@ -7,10 +7,17 @@ docker.images: ## build docker images used for local running
 	cd docker && docker build -t dune-rc-march-ansible -f ansible.Dockerfile .
 
 docker.ansible: ## run ansible on docker images
-	docker-compose -f docker/docker-compose.yml run --rm ansible -i /mnt/ansible/hosts.yaml /mnt/ansible/playbook.yaml
+	docker-compose -f docker/docker-compose.yml run --rm ansible -i /mnt/ansible/docker-cluster/hosts.yaml /mnt/ansible/docker-cluster/playbook.yaml
 
 docker.start: ## start Run Control setup in docker containers
 	docker-compose -f docker/docker-compose.yml up
+
+docker.ansible.single: ## run ansible on single docker image
+	docker-compose -f docker/docker-compose-single.yml run --rm ansible -i /mnt/ansible/single-host/hosts.yaml /mnt/ansible/single-host/playbook.yaml
+
+docker.start.single: ## start Run Control setup in single docker container
+	docker-compose -f docker/docker-compose-single.yml up
+
 
 IMAGE ?= ansible
 docker.bash: ## open a shell in a runner container

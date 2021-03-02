@@ -5,32 +5,8 @@
 
 - hosts: all
   tasks:
-  - name: yum
-    vars:
-      # yum-python bindings are not python3 compatible
-      ansible_python_interpreter: /usr/bin/python2
-    yum:
-      name:
-      - unzip
-      - iproute
-      - vim
-      - make
-      - git
-      - gcc-c++
-      - redhat-lsb-core
-      state: present
-  - name: download consul
-    get_url:
-      url: https://releases.hashicorp.com/consul/1.9.3/consul_1.9.3_linux_amd64.zip
-      dest: /tmp/consul.zip
-    register: consul_zip
-
-  - name: install consul
-    unarchive:
-      src: /tmp/consul.zip
-      dest: /usr/bin
-      copy: no
-    when: consul_zip.changed
+  - name: install base dependencies
+    include_tasks: ../tasks/install-base.yaml
 
   - name: copy consul CA cert
     copy:
@@ -41,14 +17,6 @@
     copy:
       src: consul/consul.hcl
       dest: /etc/consul.d/
-
-- hosts: cvmfs_capable_hosts
-  tasks:
-  - name: install daq-buildtools
-    git:
-      repo: https://github.com/DUNE-DAQ/daq-buildtools.git
-      dest: /opt/dune/daq-buildtools
-      version: dunedaq-v2.2.0
 
 - hosts: raft_servers
   tasks:
@@ -96,24 +64,6 @@
     retries: 90
     delay: 1
 
-  - name: download nomad
-    get_url:
-      url: https://releases.hashicorp.com/nomad/1.0.3/nomad_1.0.3_linux_amd64.zip
-      dest: /tmp/nomad.zip
-    register: nomad_zip
-
-  - name: install nomad
-    unarchive:
-      src: /tmp/nomad.zip
-      dest: /usr/bin
-      copy: no
-    when: nomad_zip.changed
-  - name: make nomad config directory
-    file:
-      path: /etc/nomad.d
-      state: directory
-
-
 - hosts: raft_servers
   tasks:
   - name: copy nomad server config
@@ -140,23 +90,11 @@
   - name: start nomad
     when: nomad_running.rc == 1
     shell: nohup /usr/bin/nomad agent -config=/etc/nomad.d/config.hcl </dev/null >/dev/null 2>&1 &
+  - name: wait for nomad
+    when: nomad_running.rc == 1
+    shell: sleep 10s
 
 - hosts: controllers_host
   tasks:
-  - name: make ccm install directory
-    file:
-      path: /opt/dune/ccm-rc
-      state: directory
   - name: install controllers
-    register: controllers
-    synchronize:
-      src: ../controllers
-      dest: /opt/dune/ccm-rc
-  - name: stop daq-application-manager
-    when: controllers.changed
-    shell: nomad stop daq-application-manager || true
-  - name: start daq-application-manager
-    shell: nomad job run /opt/dune/ccm-rc/controllers/daq-app-manager/nomad.hcl
-    changed_when: False
-    retries: 10
-    delay: 5
+    include_tasks: ../tasks/install-controllers.yaml

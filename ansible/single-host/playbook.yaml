@@ -1,0 +1,36 @@
+- hosts: all
+  tasks:
+  - name: install base dependencies
+    include_tasks: ../tasks/install-base.yaml
+
+  - name: check if consul is running
+    shell: "pgrep consul"
+    register: consul_running
+    failed_when: consul_running.rc > 1
+    changed_when: consul_running.rc == 1
+  
+  - name: start consul
+    when: consul_running.rc == 1
+    shell: nohup /usr/bin/consul agent -dev -client=0.0.0.0 </dev/null >/dev/null 2>&1 &
+
+  - name: copy nomad config
+    template:
+      src: nomad/config.hcl
+      dest: /etc/nomad.d/config.hcl
+
+  - name: check if nomad is running
+    shell: "pgrep nomad"
+    register: nomad_running
+    failed_when: nomad_running.rc > 1
+    changed_when: nomad_running.rc == 1
+  
+  - name: start nomad
+    when: nomad_running.rc == 1
+    shell: nohup /usr/bin/nomad agent -dev -bind=0.0.0.0 -config=/etc/nomad.d/config.hcl </dev/null >/dev/null 2>&1 &
+  - name: wait for nomad
+    when: nomad_running.rc == 1
+    shell: sleep 10s
+
+  - name: install controllers
+    include_tasks: ../tasks/install-controllers.yaml
+
