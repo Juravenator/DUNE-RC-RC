@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"cli.rc.ccm.dunescience.org/daq"
@@ -20,6 +21,7 @@ import (
 var log = logger.With().Str("pkg", "main").Logger().Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 var rcConfig = internal.RCConfig{}
+var writers = internal.Writers{}
 
 var flags = []cli.Flag{
 	&cli.StringFlag{Name: "config-file", Aliases: []string{"c"}, Usage: "location of a config file to use", EnvVars: []string{"RC_CONFIG"}},
@@ -132,7 +134,7 @@ func main() {
 						resources = append(resources, parsed)
 					}
 
-					err := internal.Apply(c.App.Writer, &rcConfig, resources...)
+					err := internal.Apply(writers, &rcConfig, resources...)
 					return err
 				},
 			},
@@ -178,9 +180,57 @@ func main() {
 							for i := 1; c.Args().Get(i) != ""; i++ {
 								appnames = append(appnames, c.Args().Get(i))
 							}
-							err := daq.SetAutonomousMode(c.App.Writer, &rcConfig, enabled, appnames...)
+							if len(appnames) == 0 {
+								return fmt.Errorf("bad usage - no daq app names given")
+							}
+							err := daq.SetAutonomousMode(writers, &rcConfig, enabled, appnames...)
 							if err != nil {
 								return err
+							}
+							return nil
+						},
+					},
+					{
+						Name:  "command",
+						Usage: "send command to DAQ Application",
+						Flags: []cli.Flag{
+							// &cli.StringFlag{Name: "daq-config"},
+							&cli.DurationFlag{Name: "timeout", Value: 60 * time.Second, Usage: "how long to wait for the command to complete"},
+						},
+						ArgsUsage: "command daq-app-names...",
+						Action: func(c *cli.Context) error {
+							command := c.Args().Get(0)
+							if command == "" {
+								return fmt.Errorf("bad usage - no command given")
+							}
+							appnames := []string{}
+							for i := 1; c.Args().Get(i) != ""; i++ {
+								appnames = append(appnames, c.Args().Get(i))
+							}
+							if len(appnames) == 0 {
+								return fmt.Errorf("bad usage - no daq app names given")
+							}
+							// overrideConfig := c.String("daq-config")
+							// if overrideConfig != "" {
+							// 	fmt.Fprintln(c.App.ErrWriter, "warning: custom daq config specified")
+							// }
+							wg := sync.WaitGroup{}
+							wg.Add(len(appnames))
+							allSucceeded := true
+							for _, name := range appnames {
+								go func(name string) {
+									log.Debug().Str("name", name).Str("command", command).Msg("preparing to send command")
+									err := daq.SendCommand(writers, &rcConfig, name, command, c.Duration("timeout"))
+									if err != nil {
+										allSucceeded = false
+										log.Error().Err(err).Str("name", name).Msg("command failed")
+									}
+									wg.Done()
+								}(name)
+							}
+							wg.Wait()
+							if !allSucceeded {
+								return fmt.Errorf("not all DAQ commands succeeded")
 							}
 							return nil
 						},
@@ -218,10 +268,13 @@ func main() {
 			rcConfig.Host = c.String("rc-host")
 			rcConfig.ConsulPort = uint32(c.Uint("consul-port"))
 			rcConfig.NomadPort = uint32(c.Uint("nomad-port"))
+
+			writers.Out = c.App.Writer
+			writers.Err = c.App.ErrWriter
+
 			return nil
 		},
 	}
-
 	err := app.Run(os.Args)
 	if err != nil {
 		fmt.Fprintf(app.ErrWriter, "command failed, %s\n", err)

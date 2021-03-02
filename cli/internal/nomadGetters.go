@@ -7,9 +7,6 @@ import (
 	"net/http"
 )
 
-// NomadKindType to hardcode kind
-type NomadKindType string
-
 // NomadWrapperStatus is part of NomadWrapper
 type NomadWrapperStatus struct {
 	Status  string  `json:"status"`

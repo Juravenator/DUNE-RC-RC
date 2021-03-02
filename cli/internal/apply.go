@@ -5,38 +5,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 )
 
-// GenericResource is the generic structure all resources conform to
-type GenericResource struct {
-	Meta   GenericMeta `json:"meta"`
-	Spec   GenericSpec `json:"spec"`
-	Status interface{} `json:"status,omitempty"`
-}
-
-// GenericMeta is part of GenericResource
-type GenericMeta struct {
-	Kind Kind   `json:"kind"`
-	Name string `json:"name"`
-}
-
-// GenericSpec is part of GenericResource
-type GenericSpec map[string]interface{}
-
-// Kind hardcodes known resource kinds
-type Kind string
-
-// known kinds
-const (
-	NomadKind  Kind = "nomad-job"
-	DAQAppKind Kind = "daq-application"
-)
-
 // Apply given files by name
-func Apply(writer io.Writer, c *RCConfig, resources ...GenericResource) error {
+func Apply(w Writers, c *RCConfig, resources ...GenericResource) error {
 	log.Debug().Msg("applying resources")
 	consulTodo := []GenericResource{}
 	nomadTodo := []GenericSpec{}
@@ -53,15 +27,15 @@ func Apply(writer io.Writer, c *RCConfig, resources ...GenericResource) error {
 	log.Debug().Int("consuljobs", len(consulTodo)).Int("nomadjobs", len(nomadTodo)).Msg("parsed files")
 
 	// consul jobs go first (nomad configs might depend on them)
-	fmt.Fprint(writer, "committing consul transaction... ")
+	fmt.Fprint(w.Out, "committing consul transaction... ")
 	err := consulTransaction(c, consulTodo...)
 	if err != nil {
 		return err
 	}
-	fmt.Fprintln(writer, "OK")
+	fmt.Fprintln(w.Out, "OK")
 
 	// nomad jobs go after
-	err = runNomad(writer, c, nomadTodo...)
+	err = runNomad(w, c, nomadTodo...)
 	if err != nil {
 		return err
 	}
@@ -123,9 +97,9 @@ type NomadRequest struct {
 	Job GenericSpec `json:"Job"`
 }
 
-func runNomad(writer io.Writer, c *RCConfig, jobs ...GenericSpec) error {
+func runNomad(w Writers, c *RCConfig, jobs ...GenericSpec) error {
 	for _, job := range jobs {
-		fmt.Fprintf(writer, "running nomad job %s... ", job["Name"])
+		fmt.Fprintf(w.Out, "running nomad job %s... ", job["Name"])
 		b, err := json.Marshal(NomadRequest{job})
 		if err != nil {
 			return err
@@ -142,7 +116,7 @@ func runNomad(writer io.Writer, c *RCConfig, jobs ...GenericSpec) error {
 		if resp.StatusCode != 200 {
 			return fmt.Errorf("nomad job failed with code %s", resp.Status)
 		}
-		fmt.Fprintln(writer, "OK")
+		fmt.Fprintln(w.Out, "OK")
 	}
 	return nil
 }
