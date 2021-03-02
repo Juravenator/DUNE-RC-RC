@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "kind": "daq-application",
+    "name": "daq-app-a",
+    "owner": ""
+  },
+  "spec": {
+    "daq-service": "daq-process-a",
+    "run-number": "123",
+    "configkey": "/daq-configs/my-first-config",
+    "enabled": false,
+    "desired-state": "running"
+  }
+}

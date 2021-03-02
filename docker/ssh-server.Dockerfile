@@ -1,7 +1,7 @@
 FROM dunedaq/sl7-minimal
 
 # an up to date python setup and ssh server
-RUN yum install -y openssh-server python3-pip && \
+RUN yum install -y openssh-server python3-pip unzip iproute vim make git gcc-c++ redhat-lsb-core && \
     python3 -m pip install --upgrade pip && \
     yum clean all
 
