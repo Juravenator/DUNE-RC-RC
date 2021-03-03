@@ -195,6 +195,7 @@ func main() {
 						Usage: "send command to DAQ Application",
 						Flags: []cli.Flag{
 							// &cli.StringFlag{Name: "daq-config"},
+							&cli.Uint64Flag{Name: "run-number", Usage: "set new run number before running command"},
 							&cli.DurationFlag{Name: "timeout", Value: 60 * time.Second, Usage: "how long to wait for the command to complete"},
 						},
 						ArgsUsage: "command daq-app-names...",
@@ -220,7 +221,18 @@ func main() {
 							for _, name := range appnames {
 								go func(name string) {
 									log.Debug().Str("name", name).Str("command", command).Msg("preparing to send command")
-									err := daq.SendCommand(writers, &rcConfig, name, command, c.Duration("timeout"))
+									args := daq.SendCommandOpts{
+										Rc:       &rcConfig,
+										DAQApp:   name,
+										Command:  command,
+										Timeout:  c.Duration("timeout"),
+										NewRunNr: nil,
+									}
+									if c.IsSet("run-number") {
+										nr := c.Uint64("run-number")
+										args.NewRunNr = &nr
+									}
+									err := daq.SendCommand(writers, args)
 									if err != nil {
 										allSucceeded = false
 										log.Error().Err(err).Str("name", name).Msg("command failed")

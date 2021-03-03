@@ -268,6 +268,31 @@ killall daq_application
 The correct sequence of commands is:  
 init -> conf -> start -> stop -> scrap -> (repeat)
 
+The cli accepts `--run-number` as a flag when sending commands. You can use it to configure a new run number when sending init commands.
+```bash
+$ run-control daq command --run-number 42 init daq-app-a
+```
+The new run number is persistent
+```bash
+$ run-control get daq-application daq-app-a
+{
+  "meta": {
+    "kind": "daq-application",
+    "name": "daq-app-a"
+  },
+  "spec": {
+    "configkey": "/daq-configs/my-first-config",
+    "daq-service": "daq-process-a",
+    "desired-state": "running",
+    "enabled": false,
+    "run-number": "42"
+  },
+  "status": {
+    ...
+  }
+}
+```
+
 ## Stopping 
 
 ```
