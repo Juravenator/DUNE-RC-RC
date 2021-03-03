@@ -3,7 +3,6 @@ package daq
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -13,6 +12,7 @@ import (
 	"time"
 
 	"cli.rc.ccm.dunescience.org/internal"
+	"github.com/Jeffail/gabs"
 	"github.com/Masterminds/sprig"
 )
 
@@ -182,28 +182,22 @@ func generateConfig(c *internal.RCConfig, spec internal.GenericSpec, command str
 	if err != nil {
 		return nil, err
 	}
-	var parsed []CommandPayload
-	err = json.Unmarshal(rendered.Bytes(), &parsed)
+	parsed, err := gabs.ParseJSON(rendered.Bytes())
+	commandDatas, err := parsed.Children()
+	if err != nil {
+		return nil, fmt.Errorf("cannot parse DAQ config: %w", err)
+	}
+	runNr, err := strconv.ParseUint(spec["run-number"].(string), 10, 64)
 	if err != nil {
 		return nil, err
 	}
-	for _, p := range parsed {
-		if p.ID == command {
-			runNr, err := strconv.ParseUint(spec["run-number"].(string), 10, 64)
-			if err != nil {
-				return nil, err
-			}
-			for i := range p.Data.Modules {
-
-				m, err := injectRunNumber(p.Data.Modules[i].Data, runNr)
-				if err != nil {
-					return nil, err
-				}
-				p.Data.Modules[i].Data = m
-			}
-			return json.Marshal(p)
+	for _, commandData := range commandDatas {
+		id := commandData.Search("id").Data().(string)
+		if command == id {
+			return injectRunNumber(commandData, runNr)
 		}
 	}
+
 	return nil, fmt.Errorf("command '%s' not found in config", command)
 }
 
@@ -211,28 +205,15 @@ type templateData struct {
 	RunNumber string
 }
 
-// CommandPayload is what we send as POST body to /command
-type CommandPayload struct {
-	Data CommandPayloadData `json:"data"`
-	ID   string             `json:"id"`
-}
-
-// CommandPayloadData is part of CommandPayload
-type CommandPayloadData struct {
-	Modules []CommandPayloadModule `json:"modules"`
-}
-
-// CommandPayloadModule is part of CommandPayload
-type CommandPayloadModule struct {
-	Match string                 `json:"match"`
-	Data  map[string]interface{} `json:"data"`
-}
-
-func injectRunNumber(p map[string]interface{}, runNumber uint64) (map[string]interface{}, error) {
-
-	if _, ok := p["run"].(float64); ok {
-		p["run"] = runNumber
+func injectRunNumber(daqCommandConfig *gabs.Container, runNumber uint64) ([]byte, error) {
+	commandModules, err := daqCommandConfig.Search("data", "modules").Children()
+	if err != nil {
+		return nil, fmt.Errorf("config item contains no modules: %w", err)
 	}
-
-	return p, nil
+	for _, module := range commandModules {
+		if module.Exists("data", "run") {
+			module.Set(runNumber, "data", "run")
+		}
+	}
+	return daqCommandConfig.Bytes(), nil
 }

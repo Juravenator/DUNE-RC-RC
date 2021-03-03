@@ -3,6 +3,7 @@ module cli.rc.ccm.dunescience.org
 go 1.15
 
 require (
+	github.com/Jeffail/gabs v1.4.0
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
