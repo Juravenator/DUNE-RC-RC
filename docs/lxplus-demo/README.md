@@ -4,6 +4,7 @@
 ```bash
 $ ssh lxplus #duh
 $ git clone https://github.com/Juravenator/DUNE-RC-RC.git
+$ cd DUNE-RC-RC
 $ git checkout march-rc0
 ```
 
