@@ -267,11 +267,18 @@ killall daq_application
 ## cycling through runs
 
 The correct sequence of commands is:  
-init -> conf -> start -> stop -> scrap -> (repeat)
+`init` -> `conf` -> `start` -> `stop` -> `start` -> `stop` -> ...  
+`init` should only be run once
 
 The cli accepts `--run-number` as a flag when sending commands. You can use it to configure a new run number when sending init commands.
 ```bash
-$ run-control daq command --run-number 42 init daq-app-a
+$ run-control daq command --run-number 42 init daq-app-a daq-app-b
+$ run-control daq command conf daq-app-a daq-app-b
+$ run-control daq command start daq-app-a daq-app-b
+$ run-control daq command stop daq-app-a daq-app-b
+$ run-control daq command --run-number 43 start daq-app-a daq-app-b
+$ run-control daq command stop daq-app-a daq-app-b
+$ run-control daq command --run-number 44 start daq-app-a daq-app-b
 ```
 The new run number is persistent
 ```bash
