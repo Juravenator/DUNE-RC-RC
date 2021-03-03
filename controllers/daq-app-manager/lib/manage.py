@@ -140,7 +140,7 @@ class ResponseHandler(BaseHTTPRequestHandler):
       self.send_error(400, "invalid body")
       return
 
-    log.info("received response '%s' for command '%s'", data['result'], data['command'])
+    log.info("received response '%s' for command '%s'", data['result'], data['data']['cmdid'])
     self.httpserver.response = data['result']
 
     self.send_response(200)
