@@ -247,6 +247,27 @@ FAIL
 command failed, not all DAQ commands succeeded
 ```
 
+## starting over
+
+When you do something wrong, you might be stuck running any command and receive something like this
+```
+10:10AM ERR command failed error="Command start not allowed. state: NONE, error: 0, busy: 1" name=daq-app-a pkg=main
+10:10AM ERR command failed error="Command start not allowed. state: NONE, error: 0, busy: 1" name=daq-app-b pkg=main
+```
+
+To re-run daq-applications and reset RC state:
+```bash
+# re-apply configs, resets autonomous mode to false and wipes state
+run-control apply docs/lxplus-demo/configs/*.json
+# kill daq_applications, nomad will restart them
+killall daq_application
+```
+
+## cycling through runs
+
+The correct sequence of commands is:  
+init -> conf -> start -> stop -> scrap -> (repeat)
+
 ## Stopping 
 
 ```
