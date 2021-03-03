@@ -8,6 +8,26 @@ $ cd DUNE-RC-RC
 $ git checkout march-rc0
 ```
 
+# Quick version
+
+```bash
+$ hacks/runInMem.sh
+$ export PATH="$(pwd)/cli/build:$PATH"
+$ docs/lxplus-demo/build-daq.sh
+$ run-control apply docs/lxplus-demo/configs/*.json
+$ run-control get all
+$ run-control daq command init all
+$ run-control daq command conf all
+$ run-control daq command --run-number 42 start all
+$ run-control daq command stop all
+$ run-control daq command --run-number 43 start all
+$ run-control daq command stop all
+$ run-control daq command --run-number 44 start all
+$ hacks/stopInMem.sh
+```
+
+# Verbose version
+
 ## Run Run Control in-memory
 
 ```bash
@@ -46,7 +66,7 @@ $ ip addr
 
 Before we can run listrev, we need to build it.
 ```bash
-docs/lxplus-demo/build-daq.sh
+$ docs/lxplus-demo/build-daq.sh
 ```
 
 ## Run DAQ Applications
@@ -279,9 +299,9 @@ The correct sequence of commands is:
 
 The cli accepts `--run-number` as a flag when sending commands. You can use it to configure a new run number when sending init commands.
 ```bash
-$ run-control daq command --run-number 42 init all
+$ run-control daq command init all
 $ run-control daq command conf all
-$ run-control daq command start all
+$ run-control daq command --run-number 42 start all
 $ run-control daq command stop all
 $ run-control daq command --run-number 43 start all
 $ run-control daq command stop all
