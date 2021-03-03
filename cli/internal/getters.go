@@ -39,13 +39,13 @@ func GetResource(c *RCConfig, kind Kind, id string) (*GenericResource, error) {
 }
 
 // GetAllKeys gives all keys from a given kind
-func GetAllKeys(c *RCConfig, kind string) ([]string, error) {
-	if kind == string(NomadKind) {
+func GetAllKeys(c *RCConfig, kind Kind) ([]string, error) {
+	if kind == NomadKind {
 		return GetAllNomadJobs(c)
 	}
 
 	url := fmt.Sprintf("http://%s:%d/v1/kv/%ss/?keys=&separator=/", c.Host, c.ConsulPort, kind)
-	log.Debug().Str("url", url).Str("kind", kind).Msg("fetching all keys")
+	log.Debug().Str("url", url).Str("kind", string(kind)).Msg("fetching all keys")
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -76,8 +76,8 @@ func GetAllKeys(c *RCConfig, kind string) ([]string, error) {
 }
 
 // GetAllKinds gives all known and found kinds
-func GetAllKinds(c *RCConfig) ([]string, error) {
-	result := []string{"daq-application", string(NomadKind)}
+func GetAllKinds(c *RCConfig) ([]Kind, error) {
+	result := []Kind{DAQAppKind, NomadKind}
 
 	url := fmt.Sprintf("http://%s:%d/v1/kv/?keys=&separator=/", c.Host, c.ConsulPort)
 	log.Debug().Str("url", url).Msg("fetching all kinds")
@@ -103,13 +103,13 @@ func GetAllKinds(c *RCConfig) ([]string, error) {
 			p = p[:len(p)-2]
 			alreadyIn := false
 			for _, r := range result {
-				if r == p {
+				if string(r) == p {
 					alreadyIn = true
 					break
 				}
 			}
 			if !alreadyIn {
-				result = append(result, p)
+				result = append(result, Kind(p))
 			}
 		}
 	}

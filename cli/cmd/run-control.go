@@ -73,14 +73,14 @@ func main() {
 								return err
 							}
 							for _, key := range keys {
-								fmt.Fprintln(c.App.Writer, kind+"\t"+key)
+								fmt.Fprintf(c.App.Writer, "%s\t%s", kind, key)
 							}
 						}
 						return nil
 					}
 					if id == "" {
 						// fetch and print all resources of kind
-						keys, err := internal.GetAllKeys(&rcConfig, kind)
+						keys, err := internal.GetAllKeys(&rcConfig, internal.Kind(kind))
 						if err != nil {
 							return err
 						}
@@ -177,8 +177,19 @@ func main() {
 							}
 
 							appnames := []string{}
-							for i := 1; c.Args().Get(i) != ""; i++ {
-								appnames = append(appnames, c.Args().Get(i))
+							if c.Args().Get(1) == "all" {
+								if c.Args().Len() != 2 {
+									return fmt.Errorf("bad usage - 'all' combined with other app names")
+								}
+								keys, err := internal.GetAllKeys(&rcConfig, internal.DAQAppKind)
+								if err != nil {
+									return fmt.Errorf("could not fetch all daq applications: %w", err)
+								}
+								appnames = keys
+							} else {
+								for i := 1; c.Args().Get(i) != ""; i++ {
+									appnames = append(appnames, c.Args().Get(i))
+								}
 							}
 							if len(appnames) == 0 {
 								return fmt.Errorf("bad usage - no daq app names given")
@@ -205,8 +216,19 @@ func main() {
 								return fmt.Errorf("bad usage - no command given")
 							}
 							appnames := []string{}
-							for i := 1; c.Args().Get(i) != ""; i++ {
-								appnames = append(appnames, c.Args().Get(i))
+							if c.Args().Get(1) == "all" {
+								if c.Args().Len() != 2 {
+									return fmt.Errorf("bad usage - 'all' combined with other app names")
+								}
+								keys, err := internal.GetAllKeys(&rcConfig, internal.DAQAppKind)
+								if err != nil {
+									return fmt.Errorf("could not fetch all daq applications: %w", err)
+								}
+								appnames = keys
+							} else {
+								for i := 1; c.Args().Get(i) != ""; i++ {
+									appnames = append(appnames, c.Args().Get(i))
+								}
 							}
 							if len(appnames) == 0 {
 								return fmt.Errorf("bad usage - no daq app names given")

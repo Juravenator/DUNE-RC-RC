@@ -103,7 +103,7 @@ You can traverse the nomad web interface to view stdout and stderr logs (and sch
 In autonomous mode, Run Control will send commands to DAQ applications on your behalf.
 
 ```bash
-$ run-control daq autonomous true daq-app-a daq-app-b
+$ run-control daq autonomous true all
 enabling autonomous mode for daq application daq-app-a... committing consul transaction... OK
 OK
 enabling autonomous mode for daq application daq-app-b... committing consul transaction... OK
@@ -157,7 +157,7 @@ INFO:manage:received response 'OK' for command 'init'
 We'll be sending commands manually next, so let's disable autonomous mode.
 
 ```bash
-$ run-control daq autonomous false daq-app-a daq-app-b
+$ run-control daq autonomous false all
 disabling autonomous mode for daq application daq-app-a... committing consul transaction... OK
 OK
 disabling autonomous mode for daq application daq-app-b... committing consul transaction... OK
@@ -166,8 +166,15 @@ OK
 
 ## Sending commands
 
+You can send commands to one DAQ application, or all with the `all` keyword.  
+These two commands are equivalent in this demo:
 ```bash
-$ run-control daq command init daq-app-a daq-app-b
+$ run-control daq command fakecommand daq-app-a daq-app-b
+$ run-control daq command fakecommand all
+```
+
+```bash
+$ run-control daq command init all
 fetching daq application... OK
 fetching daq application... OK
 querying location of daq application... OK
@@ -214,7 +221,7 @@ waiting for return path... 10:02AM DBG received request method=POST pkg=daq url=
 10:02AM DBG openReturnPath() returned daqResponse=OK pkg=daq
 OK
 
-$ run-control -l debug daq command start daq-app-a daq-app-b
+$ run-control -l debug daq command start all
 10:02AM DBG preparing to send command command=start name=daq-app-b pkg=main
 fetching daq application... 10:02AM DBG fetching key id=daq-app-b kind=daq-application pkg=internal url=http://localhost:8500/v1/kv/daq-applications/daq-app-b?raw=
 10:02AM DBG preparing to send command command=start name=daq-app-a pkg=main
@@ -272,13 +279,13 @@ The correct sequence of commands is:
 
 The cli accepts `--run-number` as a flag when sending commands. You can use it to configure a new run number when sending init commands.
 ```bash
-$ run-control daq command --run-number 42 init daq-app-a daq-app-b
-$ run-control daq command conf daq-app-a daq-app-b
-$ run-control daq command start daq-app-a daq-app-b
-$ run-control daq command stop daq-app-a daq-app-b
-$ run-control daq command --run-number 43 start daq-app-a daq-app-b
-$ run-control daq command stop daq-app-a daq-app-b
-$ run-control daq command --run-number 44 start daq-app-a daq-app-b
+$ run-control daq command --run-number 42 init all
+$ run-control daq command conf all
+$ run-control daq command start all
+$ run-control daq command stop all
+$ run-control daq command --run-number 43 start all
+$ run-control daq command stop all
+$ run-control daq command --run-number 44 start all
 ```
 The new run number is persistent
 ```bash
