@@ -73,7 +73,7 @@ func main() {
 								return err
 							}
 							for _, key := range keys {
-								fmt.Fprintf(c.App.Writer, "%s\t%s", kind, key)
+								fmt.Fprintf(c.App.Writer, "%s\t%s\n", kind, key)
 							}
 						}
 						return nil
