@@ -36,7 +36,7 @@ if ! pgrep consul > /dev/null; then
 fi
 >&2 echo "consul is running"
 
-cp ../ansible/single-host/nomad/config.hcl $WORKDIR/nomad-config.hcl
+cp ../../ansible/single-host/nomad/config.hcl $WORKDIR/nomad-config.hcl
 
 >&2 echo "checking if nomad is running"
 if ! pgrep nomad > /dev/null; then
@@ -48,7 +48,7 @@ fi
 >&2 echo "nomad is running"
 
 >&2 echo "installing daq-application manager"
-rsync -a --exclude=venv/ ../controllers $WORKDIR
+rsync -a --exclude=venv/ ../../controllers $WORKDIR
 
 >&2 echo "(re)starting daq-application manager"
 ! $WORKDIR/bin/nomad stop daq-application-manager 2>/dev/null
@@ -60,6 +60,6 @@ rsync -a ../ /tmp/dune-rc-hacks/
 
 cd ..
 >&2 echo ""
->&2 echo "the CLI is available at $(pwd)/cli/build/run-control"
+>&2 echo "the CLI is available at $(pwd)/../cli/build/run-control"
 >&2 echo "for convenience, you could run:"
->&2 echo "export PATH=\"$(pwd)/cli/build:\$PATH\""
+>&2 echo "export PATH=\"$(pwd)/../cli/build:\$PATH\""

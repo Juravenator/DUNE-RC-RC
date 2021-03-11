@@ -7,7 +7,6 @@
     "Datacenters": [
       "dune-rc"
     ],
-    "Dispatched": false,
     "ID": "daq-app-multiproc",
     "Name": "daq-app-multiproc",
     "TaskGroups": [
@@ -17,10 +16,13 @@
           {
             "DynamicPorts": [
               {
-                "Label": "triggerDecision"
+                "Label": "CommandFacility"
               },
               {
-                "Label": "CommandFacility"
+                "Label": "TriggerDecisionToken"
+              },
+              {
+                "Label": "TimeSync"
               }
             ]
           }
@@ -30,14 +32,16 @@
         },
         "Services": [
           {
-            "EnableTagOverride": false,
-            "Name": "daq-app-multiproc-td",
-            "PortLabel": "triggerDecision"
-          },
-          {
-            "EnableTagOverride": false,
             "Name": "daq-app-multiproc-df-cf",
             "PortLabel": "CommandFacility"
+          },
+          {
+            "Name": "daq-app-multiproc-tdt",
+            "PortLabel": "TriggerDecisionToken"
+          },
+          {
+            "Name": "daq-app-multiproc-ts",
+            "PortLabel": "TimeSync"
           }
         ],
         "Tasks": [
@@ -75,13 +79,10 @@
           {
             "DynamicPorts": [
               {
-                "Label": "TriggerDecisionToken"
-              },
-              {
-                "Label": "TimeSync"
-              },
-              {
                 "Label": "CommandFacility"
+              },
+              {
+                "Label": "triggerDecision"
               }
             ]
           }
@@ -91,19 +92,12 @@
         },
         "Services": [
           {
-            "EnableTagOverride": false,
             "Name": "daq-app-multiproc-trgemu-cf",
             "PortLabel": "CommandFacility"
           },
           {
-            "EnableTagOverride": false,
-            "Name": "daq-app-multiproc-tdt",
-            "PortLabel": "TriggerDecisionToken"
-          },
-          {
-            "EnableTagOverride": false,
-            "Name": "daq-app-multiproc-ts",
-            "PortLabel": "TimeSync"
+            "Name": "daq-app-multiproc-td",
+            "PortLabel": "triggerDecision"
           }
         ],
         "Tasks": [

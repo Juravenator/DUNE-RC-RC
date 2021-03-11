@@ -11,16 +11,21 @@ job "daq-app-multiproc" {
 
   group "df" {
     network {
-      port "triggerDecision" {}
       port "CommandFacility" {}
-    }
-    service {
-      name = "daq-app-multiproc-td"
-      port = "triggerDecision"
+      port "TriggerDecisionToken" {}
+      port "TimeSync" {}
     }
     service {
       name = "daq-app-multiproc-df-cf"
       port = "CommandFacility"
+    }
+    service {
+      name = "daq-app-multiproc-tdt"
+      port = "TriggerDecisionToken"
+    }
+    service {
+      name = "daq-app-multiproc-ts"
+      port = "TimeSync"
     }
     restart {
       attempts = 1
@@ -46,9 +51,8 @@ job "daq-app-multiproc" {
   group "trgemu" {
 
     network {
-      port "TriggerDecisionToken" {}
-      port "TimeSync" {}
       port "CommandFacility" {}
+      port "triggerDecision" {}
     }
 
     service {
@@ -56,12 +60,8 @@ job "daq-app-multiproc" {
       port = "CommandFacility"
     }
     service {
-      name = "daq-app-multiproc-tdt"
-      port = "TriggerDecisionToken"
-    }
-    service {
-      name = "daq-app-multiproc-ts"
-      port = "TimeSync"
+      name = "daq-app-multiproc-td"
+      port = "triggerDecision"
     }
 
     restart {
