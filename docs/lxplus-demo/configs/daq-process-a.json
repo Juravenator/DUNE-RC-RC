@@ -46,7 +46,7 @@
           {
             "Config": {
               "args": [
-                "/tmp/listrev-app-starter.sh",
+                "/tmp/dune-rc-hacks/lxplus-demo/listrev-app-starter.sh",
                 "--commandFacility",
                 "rest://localhost:${NOMAD_PORT_api}",
                 "--name",

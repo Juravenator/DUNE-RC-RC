@@ -22,7 +22,7 @@ job "daq-process-b" {
       driver = "raw_exec"
       config {
         command = "bash"
-        args    = ["/tmp/listrev-app-starter.sh", "--commandFacility", "rest://localhost:${NOMAD_PORT_api}", "--name", "${NOMAD_JOB_NAME}"]
+        args    = ["/tmp/dune-rc-hacks/lxplus-demo/listrev-app-starter.sh", "--commandFacility", "rest://localhost:${NOMAD_PORT_api}", "--name", "${NOMAD_JOB_NAME}"]
       }
       constraint {
         attribute    = "${meta.module-a-tpc-apa}"

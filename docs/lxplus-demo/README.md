@@ -11,7 +11,7 @@ $ git checkout march-rc0
 # Quick version
 
 ```bash
-$ hacks/runInMem.sh
+$ hacks/lxplus/runInMem.sh
 $ export PATH="$(pwd)/cli/build:$PATH"
 $ docs/lxplus-demo/build-daq.sh
 $ run-control apply docs/lxplus-demo/configs/*.json
@@ -23,7 +23,7 @@ $ run-control daq command stop all
 $ run-control daq command --run-number 43 start all
 $ run-control daq command stop all
 $ run-control daq command --run-number 44 start all
-$ hacks/stopInMem.sh
+$ hacks/lxplus/stopInMem.sh
 ```
 
 # Verbose version
@@ -31,7 +31,7 @@ $ hacks/stopInMem.sh
 ## Run Run Control in-memory
 
 ```bash
-$ hacks/runInMem.sh
+$ hacks/lxplus/runInMem.sh
 WARNING
 This is NOT a production setup
 checking if consul is installed
@@ -48,7 +48,7 @@ $ export ...
 
 Do NOT forget to be nice and stop RC after you're done:
 ```
-$ hacks/stopInMem.sh
+$ hacks/lxplus/stopInMem.sh
 ```
 
 You can now access both Consul and Nomad on ports 8500 and 4646 respectively.
@@ -331,6 +331,6 @@ $ run-control get daq-application daq-app-a
 ## Stopping 
 
 ```
-$ hacks/stopInMem.sh
+$ hacks/lxplus/stopInMem.sh
 ```
 This will stop RC and all applications that it was running.

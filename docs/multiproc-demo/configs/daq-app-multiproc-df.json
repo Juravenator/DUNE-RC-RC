@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "kind": "daq-application",
+    "name": "daq-app-multiproc-df",
+    "owner": ""
+  },
+  "spec": {
+    "daq-service": "daq-app-multiproc-df-cf",
+    "run-number": "123",
+    "configkey": "/daq-configs/daq-app-multiproc-df",
+    "enabled": false,
+    "desired-state": "running"
+  }
+}

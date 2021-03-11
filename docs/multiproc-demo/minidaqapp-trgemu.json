@@ -1,0 +1,252 @@
+[
+    {
+        "data": {
+            "modules": [
+                {
+                    "data": {
+                        "qinfos": [
+                            {
+                                "dir": "input",
+                                "inst": "trigger_decision_to_netq",
+                                "name": "input"
+                            }
+                        ]
+                    },
+                    "inst": "qton_trigdec",
+                    "plugin": "QueueToNetwork"
+                },
+                {
+                    "data": {
+                        "qinfos": [
+                            {
+                                "dir": "output",
+                                "inst": "token_from_netq",
+                                "name": "output"
+                            }
+                        ]
+                    },
+                    "inst": "ntoq_token",
+                    "plugin": "NetworkToQueue"
+                },
+                {
+                    "data": {
+                        "qinfos": [
+                            {
+                                "dir": "output",
+                                "inst": "time_sync_from_netq",
+                                "name": "output"
+                            }
+                        ]
+                    },
+                    "inst": "ntoq_timesync",
+                    "plugin": "NetworkToQueue"
+                },
+                {
+                    "data": {
+                        "qinfos": [
+                            {
+                                "dir": "input",
+                                "inst": "time_sync_from_netq",
+                                "name": "time_sync_source"
+                            },
+                            {
+                                "dir": "input",
+                                "inst": "token_from_netq",
+                                "name": "token_source"
+                            },
+                            {
+                                "dir": "output",
+                                "inst": "trigger_decision_to_netq",
+                                "name": "trigger_decision_sink"
+                            }
+                        ]
+                    },
+                    "inst": "tde",
+                    "plugin": "TriggerDecisionEmulator"
+                }
+            ],
+            "queues": [
+                {
+                    "capacity": 100,
+                    "inst": "time_sync_from_netq",
+                    "kind": "FollySPSCQueue"
+                },
+                {
+                    "capacity": 20,
+                    "inst": "token_from_netq",
+                    "kind": "FollySPSCQueue"
+                },
+                {
+                    "capacity": 20,
+                    "inst": "trigger_decision_to_netq",
+                    "kind": "FollySPSCQueue"
+                }
+            ]
+        },
+        "entry_state": "NONE",
+        "exit_state": "INITIAL",
+        "id": "init"
+    },
+    {
+        "data": {
+            "modules": [
+                {
+                    "data": {
+                        "msg_module_name": "TriggerDecisionNQ",
+                        "msg_type": "dunedaq::dfmessages::TriggerDecision",
+                        "sender_config": {
+                            "address": "tcp://{{ with firstServiceAddr \"daq-app-multiproc-td\" }}{{ .Address }}:{{ .Port }}{{ end }}",
+                            "ipm_plugin_type": "ZmqSender",
+                            "stype": "msgpack"
+                        }
+                    },
+                    "match": "qton_trigdec"
+                },
+                {
+                    "data": {
+                        "msg_module_name": "TriggerDecisionTokenNQ",
+                        "msg_type": "dunedaq::dfmessages::TriggerDecisionToken",
+                        "receiver_config": {
+                            "address": "tcp://{{ with firstServiceAddr \"daq-app-multiproc-tdt\" }}{{ .Address }}:{{ .Port }}{{ end }}",
+                            "ipm_plugin_type": "ZmqReceiver"
+                        }
+                    },
+                    "match": "ntoq_token"
+                },
+                {
+                    "data": {
+                        "msg_module_name": "TimeSyncNQ",
+                        "msg_type": "dunedaq::dfmessages::TimeSync",
+                        "receiver_config": {
+                            "address": "tcp://{{ with firstServiceAddr \"daq-app-multiproc-ts\" }}{{ .Address }}:{{ .Port }}{{ end }}",
+                            "ipm_plugin_type": "ZmqReceiver"
+                        }
+                    },
+                    "match": "ntoq_timesync"
+                },
+                {
+                    "data": {
+                        "clock_frequency_hz": 50000000,
+                        "links": [
+                            0,
+                            1
+                        ],
+                        "max_links_in_request": 2,
+                        "max_readout_window_ticks": 50000,
+                        "min_links_in_request": 2,
+                        "min_readout_window_ticks": 50000,
+                        "repeat_trigger_count": 1,
+                        "stop_burst_count": 0,
+                        "trigger_delay_ticks": 50000000,
+                        "trigger_interval_ticks": 50000000,
+                        "trigger_offset": 0,
+                        "trigger_window_offset": 25000
+                    },
+                    "match": "tde"
+                }
+            ]
+        },
+        "entry_state": "INITIAL",
+        "exit_state": "CONFIGURED",
+        "id": "conf"
+    },
+    {
+        "data": {
+            "modules": [
+                {
+                    "data": {
+                        "disable_data_storage": false,
+                        "run": 333,
+                        "trigger_interval_ticks": 64000000
+                    },
+                    "match": "qton_trigdec"
+                },
+                {
+                    "data": {
+                        "disable_data_storage": false,
+                        "run": 333,
+                        "trigger_interval_ticks": 64000000
+                    },
+                    "match": "ntoq_token"
+                },
+                {
+                    "data": {
+                        "disable_data_storage": false,
+                        "run": 333,
+                        "trigger_interval_ticks": 64000000
+                    },
+                    "match": "ntoq_timesync"
+                },
+                {
+                    "data": {
+                        "disable_data_storage": false,
+                        "run": 333,
+                        "trigger_interval_ticks": 64000000
+                    },
+                    "match": "tde"
+                }
+            ]
+        },
+        "entry_state": "CONFIGURED",
+        "exit_state": "RUNNING",
+        "id": "start"
+    },
+    {
+        "data": {
+            "modules": [
+                {
+                    "match": "qton_trigdec"
+                },
+                {
+                    "match": "ntoq_timesync"
+                },
+                {
+                    "match": "ntoq_token"
+                },
+                {
+                    "match": "tde"
+                }
+            ]
+        },
+        "entry_state": "RUNNING",
+        "exit_state": "CONFIGURED",
+        "id": "stop"
+    },
+    {
+        "data": {
+            "modules": [
+                {
+                    "match": ""
+                }
+            ]
+        },
+        "entry_state": "RUNNING",
+        "exit_state": "RUNNING",
+        "id": "pause"
+    },
+    {
+        "data": {
+            "modules": [
+                {
+                    "data": {
+                        "trigger_interval_ticks": 50000000
+                    },
+                    "match": "tde"
+                }
+            ]
+        },
+        "entry_state": "RUNNING",
+        "exit_state": "RUNNING",
+        "id": "resume"
+    },
+    {
+        "data": {
+            "modules": [
+                {
+                    "match": ""
+                }
+            ]
+        },
+        "id": "scrap"
+    }
+]

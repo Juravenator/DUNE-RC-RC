@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "kind": "daq-application",
+    "name": "daq-app-multiproc-emu",
+    "owner": ""
+  },
+  "spec": {
+    "daq-service": "daq-app-multiproc-trgemu-cf",
+    "run-number": "123",
+    "configkey": "/daq-configs/daq-app-multiproc-emu",
+    "enabled": false,
+    "desired-state": "running"
+  }
+}

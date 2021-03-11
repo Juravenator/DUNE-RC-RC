@@ -1,0 +1,144 @@
+{
+  "meta": {
+    "kind": "nomad-job",
+    "name": "daq-app-multiproc"
+  },
+  "spec": {
+    "Datacenters": [
+      "dune-rc"
+    ],
+    "Dispatched": false,
+    "ID": "daq-app-multiproc",
+    "Name": "daq-app-multiproc",
+    "TaskGroups": [
+      {
+        "Name": "df",
+        "Networks": [
+          {
+            "DynamicPorts": [
+              {
+                "Label": "triggerDecision"
+              },
+              {
+                "Label": "commandFacility"
+              }
+            ]
+          }
+        ],
+        "RestartPolicy": {
+          "Attempts": 1
+        },
+        "Services": [
+          {
+            "EnableTagOverride": false,
+            "Name": "daq-app-multiproc-td",
+            "PortLabel": "triggerDecision"
+          },
+          {
+            "EnableTagOverride": false,
+            "Name": "daq-app-multiproc-df-cf",
+            "PortLabel": "CommandFacility"
+          }
+        ],
+        "Tasks": [
+          {
+            "Config": {
+              "command": "bash",
+              "args": [
+                "/tmp/dune-rc-hacks/multi-proc-daq-2.4/start.sh",
+                "--commandFacility",
+                "rest://localhost:${NOMAD_PORT_CommandFacility}",
+                "--name",
+                "${NOMAD_JOB_NAME}_${NOMAD_GROUP_NAME}"
+              ]
+            },
+            "Constraints": [
+              {
+                "LTarget": "${meta.module-a-tpc-apa}",
+                "Operand": "set_contains",
+                "RTarget": "42"
+              },
+              {
+                "LTarget": "${meta.cvmfs}",
+                "Operand": "=",
+                "RTarget": "/cvmfs"
+              }
+            ],
+            "Driver": "raw_exec",
+            "Name": "daq-application"
+          }
+        ]
+      },
+      {
+        "Name": "trgemu",
+        "Networks": [
+          {
+            "DynamicPorts": [
+              {
+                "Label": "TriggerDecisionToken"
+              },
+              {
+                "Label": "TimeSync"
+              },
+              {
+                "Label": "CommandFacility"
+              }
+            ]
+          }
+        ],
+        "RestartPolicy": {
+          "Attempts": 1
+        },
+        "Services": [
+          {
+            "EnableTagOverride": false,
+            "Name": "daq-app-multiproc-trgemu-cf",
+            "PortLabel": "CommandFacility"
+          },
+          {
+            "EnableTagOverride": false,
+            "Name": "daq-app-multiproc-tdt",
+            "PortLabel": "TriggerDecisionToken"
+          },
+          {
+            "EnableTagOverride": false,
+            "Name": "daq-app-multiproc-ts",
+            "PortLabel": "TimeSync"
+          }
+        ],
+        "Tasks": [
+          {
+            "Config": {
+              "args": [
+                "/tmp/dune-rc-hacks/multi-proc-daq-2.4/start.sh",
+                "--commandFacility",
+                "rest://localhost:${NOMAD_PORT_CommandFacility}",
+                "--name",
+                "${NOMAD_JOB_NAME}_${NOMAD_GROUP_NAME}"
+              ],
+              "command": "bash"
+            },
+            "Constraints": [
+              {
+                "LTarget": "${meta.module-a-tpc-apa}",
+                "Operand": "set_contains",
+                "RTarget": "43"
+              },
+              {
+                "LTarget": "${meta.cvmfs}",
+                "Operand": "=",
+                "RTarget": "/cvmfs"
+              }
+            ],
+            "Driver": "raw_exec",
+            "Name": "daq-application"
+          }
+        ]
+      }
+    ],
+    "Type": "service",
+    "Update": {
+      "MaxParallel": 1
+    }
+  }
+}

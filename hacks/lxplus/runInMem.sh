@@ -55,7 +55,8 @@ rsync -a --exclude=venv/ ../controllers $WORKDIR
 $WORKDIR/bin/nomad job run nomad-lxplus.hcl
 
 >&2 echo "installing hack scripts"
-cp listrev-app-starter.sh /tmp
+mkdir -p /tmp/dune-rc-hacks
+rsync -a ../ /tmp/dune-rc-hacks/
 
 cd ..
 >&2 echo ""
