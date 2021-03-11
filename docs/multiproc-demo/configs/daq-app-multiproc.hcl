@@ -12,7 +12,7 @@ job "daq-app-multiproc" {
   group "df" {
     network {
       port "triggerDecision" {}
-      port "commandFacility" {}
+      port "CommandFacility" {}
     }
     service {
       name = "daq-app-multiproc-td"
