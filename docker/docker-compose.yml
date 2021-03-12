@@ -1,4 +1,4 @@
-version: "3"
+version: "3.8"
 
 services:
   # readout unit PCs
@@ -7,30 +7,41 @@ services:
     image: dune-rc-march-ssh-server
     privileged: true
     volumes:
-    - ../cvmfs/:/cvmfs
+    - /cvmfs/:/cvmfs
     - ../:/dune-rc
   dune-rc-march-ru-2:
     image: dune-rc-march-ssh-server
     privileged: true
     volumes:
-    - ../cvmfs/:/cvmfs
+    - /cvmfs/:/cvmfs
+    - ../:/dune-rc
   dune-rc-march-ru-3:
     image: dune-rc-march-ssh-server
     privileged: true
     volumes:
-    - ../cvmfs/:/cvmfs
+    - /cvmfs/:/cvmfs
+    - ../:/dune-rc
 
   # general purpose PCs
   # no special hardware
   dune-rc-march-gp-1:
     image: dune-rc-march-ssh-server
     privileged: true
+    volumes:
+    - /cvmfs/:/cvmfs
+    - ../:/dune-rc
   dune-rc-march-gp-2:
     image: dune-rc-march-ssh-server
     privileged: true
+    volumes:
+    - /cvmfs/:/cvmfs
+    - ../:/dune-rc
   dune-rc-march-gp-3:
     image: dune-rc-march-ssh-server
     privileged: true
+    volumes:
+    - /cvmfs/:/cvmfs
+    - ../:/dune-rc
 
   # raft leaders
   # recommended to be dedicated compute units
