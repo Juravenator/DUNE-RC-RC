@@ -53,6 +53,7 @@ $ exit
 
 ```bash
 $ export PATH="$(pwd)/cli/build:$PATH"
+$ run-control apply docs/multiproc-demo/configs/*.json
 $ run-control get all
 $ run-control daq command init all
 $ run-control daq command conf all

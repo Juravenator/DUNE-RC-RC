@@ -330,7 +330,7 @@
                                 "overall_prefix": "swtest",
                                 "run_number_prefix": "run"
                             },
-                            "max_file_size_bytes": 1073741834,
+                            "max_file_size_bytes": 1073741824,
                             "mode": "all-per-file",
                             "name": "data_store",
                             "type": "HDF5DataStore"
@@ -388,6 +388,7 @@
                 {
                     "data": {
                         "apa_number": 0,
+                        "emulator_mode": false,
                         "fake_trigger_flag": 0,
                         "latency_buffer_size": 500000,
                         "link_number": 0,
@@ -401,6 +402,7 @@
                 {
                     "data": {
                         "apa_number": 0,
+                        "emulator_mode": false,
                         "fake_trigger_flag": 0,
                         "latency_buffer_size": 500000,
                         "link_number": 1,
