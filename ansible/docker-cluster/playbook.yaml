@@ -8,6 +8,9 @@
   - name: install base dependencies
     include_tasks: ../tasks/install-base.yaml
 
+  - name: install hacks
+    include_tasks: ../tasks/install-hacks.yaml
+
   - name: copy consul CA cert
     copy:
       src: consul/consul-agent-ca.pem

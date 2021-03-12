@@ -3,6 +3,9 @@
   - name: install base dependencies
     include_tasks: ../tasks/install-base.yaml
 
+  - name: install hacks
+    include_tasks: ../tasks/install-hacks.yaml
+
   - name: check if consul is running
     shell: "pgrep consul"
     register: consul_running

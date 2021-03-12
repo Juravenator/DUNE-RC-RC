@@ -1,0 +1,9 @@
+# this job ensures compatibility with the lxplus deploys (where we're forced to use /tmp...)
+- name: make hacks directory
+  file:
+    path: /tmp/dune-rc-hacks
+    state: directory
+- name: install hacks
+  synchronize:
+    src: ../../hacks/
+    dest: /tmp/dune-rc-hacks
