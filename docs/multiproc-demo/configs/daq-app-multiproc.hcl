@@ -75,7 +75,7 @@ job "daq-app-multiproc" {
       }
       constraint {
         attribute    = "${meta.module-a-tpc-apa}"
-        set_contains = "43"
+        set_contains = "44"
       }
       constraint {
         attribute = "${meta.cvmfs}"

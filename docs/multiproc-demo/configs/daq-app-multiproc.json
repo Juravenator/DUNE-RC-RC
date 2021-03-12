@@ -116,7 +116,7 @@
               {
                 "LTarget": "${meta.module-a-tpc-apa}",
                 "Operand": "set_contains",
-                "RTarget": "43"
+                "RTarget": "44"
               },
               {
                 "LTarget": "${meta.cvmfs}",
