@@ -11,6 +11,7 @@
     - git
     - gcc-c++
     - redhat-lsb-core
+    - util-linux
     state: present
 - name: download consul
   get_url:
