@@ -1,0 +1,1 @@
+echo 8000 > /proc/sys/vm/nr_hugepages

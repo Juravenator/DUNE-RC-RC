@@ -1,0 +1,13 @@
+docker run --mount type=bind,source=`pwd`,target=/mnt --privileged archlinux /mnt/test
+10 READ/WRITE speed tests in CPU clock ticks for a 1073741824 bytes memory region (1000000 clock ticks per s)
+WRITE		READ
+11572013	11402976
+11575408	11398819
+11571607	11395285
+11573404	11392663
+11569509	11391713
+11570313	11398004
+11571496	11391669
+11571267	11394010
+11572768	11393635
+11571979	11393715

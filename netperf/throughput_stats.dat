@@ -1,0 +1,9 @@
+# stats "bare-metal/macbook-to-imac-bare-metal-TCP_RR-1000b-x100.txt" using 2
+# stats "docker-hostnet/macbook-to-imac-TCP_RR-1000b-x100.txt" using 2
+# stats "docker-swarm/macbook-to-imac-TCP_RR-1000b-x100.txt" using 2
+# stats "k8s-calico-bgp/macbook-to-imac-calico-bgp-TCP_RR-1000b-x100.txt" using 2
+# NAME            MEAN         STDDEV
+bare-metal        7348.5210    414.8058
+docker-hostnet    7525.4460    483.4993
+docker-swarm      6424.1148    521.5141
+calico            5893.2356    355.3895
